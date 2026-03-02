@@ -11,7 +11,13 @@ function RegisterPage() {
   const { signIn } = useAuthActions();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async ({ email, password }: { email: string; password: string }) => {
+  const handleSubmit = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     setIsLoading(true);
     try {
       await signIn("password", { email, password, flow: "signUp" });
@@ -27,14 +33,19 @@ function RegisterPage() {
           <h1 className="text-2xl font-bold tracking-tight text-stone-900">
             Manifest Journal
           </h1>
-          <p className="mt-1 text-sm text-stone-500">
-            Create your account
-          </p>
+          <p className="mt-1 text-sm text-stone-500">Create your account</p>
         </div>
-        <AuthForm mode="register" onSubmit={handleSubmit} isLoading={isLoading} />
+        <AuthForm
+          mode="register"
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+        />
         <p className="text-sm text-stone-500">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-stone-900 hover:underline">
+          <Link
+            to="/login"
+            className="font-medium text-stone-900 hover:underline"
+          >
             Sign in
           </Link>
         </p>
