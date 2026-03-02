@@ -1,4 +1,4 @@
-import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, Outlet, createRootRoute } from '@tanstack/react-router'
 import '../styles.css'
 
 export const Route = createRootRoute({
@@ -6,5 +6,15 @@ export const Route = createRootRoute({
 })
 
 function Root() {
-  return <Outlet />
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <Outlet />
+        <Scripts />
+      </body>
+    </html>
+  )
 }
