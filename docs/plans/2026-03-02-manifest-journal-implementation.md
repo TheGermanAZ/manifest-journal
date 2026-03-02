@@ -39,7 +39,7 @@ Key decisions to carry forward:
 **Step 1: Scaffold the TanStack Start project**
 
 ```bash
-pnpm dlx create-tsrouter-app@latest . --template start --package-manager pnpm
+bunx create-tsrouter-app@latest . --template start --package-manager bun
 ```
 
 When prompted, accept defaults. This creates the boilerplate for TanStack Start with SSR.
@@ -47,17 +47,17 @@ When prompted, accept defaults. This creates the boilerplate for TanStack Start 
 **Step 2: Install dependencies**
 
 ```bash
-pnpm add convex @convex-dev/auth
-pnpm add @anthropic-ai/sdk openai
-pnpm add @tanstack/react-query
-pnpm add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event
+bun add convex @convex-dev/auth
+bun add @anthropic-ai/sdk openai
+bun add @tanstack/react-query
+bun add -D vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom @testing-library/user-event
 ```
 
 **Step 3: Install Tailwind**
 
 ```bash
-pnpm add -D tailwindcss postcss autoprefixer
-pnpm dlx tailwindcss init -p
+bun add -D tailwindcss postcss autoprefixer
+bunx tailwindcss init -p
 ```
 
 **Step 4: Configure Tailwind — `tailwind.config.ts`**
@@ -83,7 +83,7 @@ export default {
 **Step 6: Initialize Convex**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 This creates `convex/` directory and `convex/_generated/`. Note the deployment URL from output — you'll need it.
@@ -123,7 +123,7 @@ export function createRouter() {
 **Step 9: Verify dev server starts**
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 Expected: App runs at `http://localhost:3000` with default TanStack Start page.
@@ -222,7 +222,7 @@ export default defineSchema({
 **Step 2: Push schema to Convex**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 Expected: `✓ Schema updated` in output.
@@ -301,7 +301,7 @@ function Root() {
 **Step 4: Push to Convex**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 Expected: Auth routes configured.
@@ -355,7 +355,7 @@ describe("AuthForm", () => {
 **Step 2: Run to verify it fails**
 
 ```bash
-pnpm vitest run app/components/AuthForm.test.tsx
+bunx vitest run app/components/AuthForm.test.tsx
 ```
 
 Expected: FAIL — `AuthForm` not found.
@@ -424,7 +424,7 @@ export function AuthForm({ mode, onSubmit, isLoading }: AuthFormProps) {
 **Step 4: Run test to verify it passes**
 
 ```bash
-pnpm vitest run app/components/AuthForm.test.tsx
+bunx vitest run app/components/AuthForm.test.tsx
 ```
 
 Expected: PASS
@@ -616,7 +616,7 @@ In `app/routes/__root.tsx`, after the ConvexAuthProvider, the router handles red
 **Step 4: Push Convex functions**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 Expected: `users.ts` functions deployed.
@@ -669,7 +669,7 @@ describe("ManifestoEditor", () => {
 **Step 2: Run to verify fails**
 
 ```bash
-pnpm vitest run app/components/ManifestoEditor.test.tsx
+bunx vitest run app/components/ManifestoEditor.test.tsx
 ```
 
 Expected: FAIL
@@ -710,7 +710,7 @@ export function ManifestoEditor({ value, onChange }: ManifestoEditorProps) {
 **Step 4: Run test to verify passes**
 
 ```bash
-pnpm vitest run app/components/ManifestoEditor.test.tsx
+bunx vitest run app/components/ManifestoEditor.test.tsx
 ```
 
 Expected: PASS
@@ -975,7 +975,7 @@ export const recentEntries = query({
 **Step 2: Push to Convex**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 Expected: `entries.ts` functions deployed.
@@ -1162,7 +1162,7 @@ export const conversationalTurn = action({
 **Step 2: Push to Convex**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 Expected: `ai.ts` actions deployed.
@@ -1212,7 +1212,7 @@ describe("ModeSelector", () => {
 **Step 2: Run to verify fails**
 
 ```bash
-pnpm vitest run app/components/ModeSelector.test.tsx
+bunx vitest run app/components/ModeSelector.test.tsx
 ```
 
 Expected: FAIL
@@ -1261,7 +1261,7 @@ export function ModeSelector({ selected, onSelect }: ModeSelectorProps) {
 **Step 4: Run test to verify passes**
 
 ```bash
-pnpm vitest run app/components/ModeSelector.test.tsx
+bunx vitest run app/components/ModeSelector.test.tsx
 ```
 
 Expected: PASS
@@ -1431,7 +1431,7 @@ describe("AlignmentDial", () => {
 **Step 2: Run to verify fails**
 
 ```bash
-pnpm vitest run app/components/AlignmentDial.test.tsx
+bunx vitest run app/components/AlignmentDial.test.tsx
 ```
 
 Expected: FAIL
@@ -1485,7 +1485,7 @@ export function AlignmentDial({ score, rationale }: AlignmentDialProps) {
 **Step 4: Run test to verify passes**
 
 ```bash
-pnpm vitest run app/components/AlignmentDial.test.tsx
+bunx vitest run app/components/AlignmentDial.test.tsx
 ```
 
 Expected: PASS
@@ -1680,7 +1680,7 @@ In the editor JSX, add above the textarea:
 **Step 3: Verify manually in browser**
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 Switch to Guided mode and verify the prompt appears after ~2 seconds.
@@ -1898,7 +1898,7 @@ Replace the editor section with a conditional:
 **Step 4: Push Convex functions**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 **Step 5: Commit**
@@ -1959,7 +1959,7 @@ describe("EntryCard", () => {
 **Step 2: Run to verify fails**
 
 ```bash
-pnpm vitest run app/components/EntryCard.test.tsx
+bunx vitest run app/components/EntryCard.test.tsx
 ```
 
 Expected: FAIL
@@ -2043,7 +2043,7 @@ export function EntryCard({ entry, onClick }: EntryCardProps) {
 **Step 4: Run test to verify passes**
 
 ```bash
-pnpm vitest run app/components/EntryCard.test.tsx
+bunx vitest run app/components/EntryCard.test.tsx
 ```
 
 Expected: PASS
@@ -2324,7 +2324,7 @@ function DashboardPage() {
 **Step 4: Push Convex functions**
 
 ```bash
-pnpm dlx convex dev --once
+bunx convex dev --once
 ```
 
 **Step 5: Commit**
@@ -2484,7 +2484,7 @@ import "@testing-library/jest-dom";
 **Step 3: Run all tests**
 
 ```bash
-pnpm vitest run
+bunx vitest run
 ```
 
 Expected: All tests pass.
