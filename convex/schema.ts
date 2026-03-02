@@ -56,7 +56,7 @@ export default defineSchema({
     ),
   })
     .index("by_user", ["userId"])
-    .index("by_user_and_time", ["userId"])
+    .index("by_user_and_time", ["userId", "_creationTime"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
       dimensions: 1536,
