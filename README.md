@@ -1,6 +1,9 @@
 # Manifest Journal
 
 A daily journaling web app that coaches you toward your dream life by analyzing your writing with AI.
+Finished looks like a journal app that uses AI as a coach.
+
+I usually stop at deployment and having a feature set working but not polished. I want to make this app feel polished and go through the process of seeing what it takes to get users and market an app.
 
 ## Getting Started
 
@@ -24,16 +27,6 @@ bun test
 ## Stack
 
 - **Frontend:** TanStack Start + TanStack Router
-- **Database:** Convex
-- **Auth:** Convex Auth (email/password + Google OAuth)
+
 - **AI:** Claude (claude-sonnet-4-6) via Anthropic SDK
 - **Styling:** Tailwind CSS v4
-
-## Setup
-
-1. Create a [Convex](https://convex.dev) account and project
-2. Run `bunx convex dev` to initialize the backend
-3. Copy `.env.local` and fill in your API keys:
-   - `CONVEX_DEPLOYMENT` / `VITE_CONVEX_URL` — from Convex dashboard
-   - `ANTHROPIC_API_KEY` — from [Anthropic](https://console.anthropic.com)
-   - `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` — from Google Cloud Console (optional, for OAuth)
