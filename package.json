@@ -13,17 +13,18 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@convex-dev/auth": "^0.0.87",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
+    "@tanstack/react-query": "^5.74.4",
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-start": "^1.166.1",
     "@tanstack/router-plugin": "^1.132.0",
     "convex": "^1.24.4",
-    "@convex-dev/auth": "^0.0.87",
-    "@anthropic-ai/sdk": "^0.39.0",
-    "@tanstack/react-query": "^5.74.4",
     "lucide-react": "^0.545.0",
+    "openai": "^6.25.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18"
