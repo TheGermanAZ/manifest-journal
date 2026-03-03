@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState, useEffect } from "react";
+import { Id } from "../../convex/_generated/dataModel";
 import { AuthGuard } from "../components/AuthGuard";
 import { ModeSelector } from "../components/ModeSelector";
 import { ConversationView } from "../components/ConversationView";
@@ -101,7 +102,7 @@ function HomePage() {
 
       // Persist user turn
       await addTurn({
-        entryId: entryId as any,
+        entryId: entryId as Id<"entries">,
         role: "user",
         content: message,
       });
@@ -119,7 +120,7 @@ function HomePage() {
 
       // Persist assistant turn
       await addTurn({
-        entryId: entryId as any,
+        entryId: entryId as Id<"entries">,
         role: "assistant",
         content: assistantContent,
       });
@@ -143,7 +144,7 @@ function HomePage() {
         .join("\n\n");
       const recentContents = (recent ?? []).map((e) => e.content);
       await analyzeEntry({
-        entryId: conversationEntryId as any,
+        entryId: conversationEntryId as Id<"entries">,
         content: fullContent,
         dreamProfile: user.dreamProfile,
         recentEntryContents: recentContents,

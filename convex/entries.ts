@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
@@ -10,6 +10,7 @@ export const createEntry = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    if (args.content.length > 50000) throw new Error("Content too long");
     return ctx.db.insert("entries", {
       userId,
       content: args.content,
@@ -18,7 +19,7 @@ export const createEntry = mutation({
   },
 });
 
-export const updateEntryAnalysis = mutation({
+export const updateEntryAnalysis = internalMutation({
   args: {
     entryId: v.id("entries"),
     analysis: v.object({
@@ -34,10 +35,6 @@ export const updateEntryAnalysis = mutation({
     }),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-    const entry = await ctx.db.get(args.entryId);
-    if (!entry || entry.userId !== userId) throw new Error("Not found");
     await ctx.db.patch(args.entryId, { analysis: args.analysis });
   },
 });
@@ -51,7 +48,7 @@ export const listEntries = query({
       .query("entries")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
-      .take(args.limit ?? 50);
+      .take(Math.min(args.limit ?? 50, 100));
   },
 });
 

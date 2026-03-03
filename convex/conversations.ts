@@ -11,6 +11,8 @@ export const addTurn = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    const entry = await ctx.db.get(args.entryId);
+    if (!entry || entry.userId !== userId) throw new Error("Not found");
     return ctx.db.insert("conversationTurns", {
       entryId: args.entryId,
       userId,
@@ -25,6 +27,8 @@ export const getTurns = query({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return [];
+    const entry = await ctx.db.get(args.entryId);
+    if (!entry || entry.userId !== userId) return [];
     return ctx.db
       .query("conversationTurns")
       .withIndex("by_entry", (q) => q.eq("entryId", args.entryId))
