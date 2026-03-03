@@ -25,6 +25,10 @@ export const updateDreamProfile = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
+    if (args.manifesto.length > 5000) throw new Error("Manifesto too long");
+    for (const [key, value] of Object.entries(args.categories)) {
+      if (value.length > 2000) throw new Error(`Category ${key} too long`);
+    }
     await ctx.db.patch(userId, {
       dreamProfile: {
         manifesto: args.manifesto,

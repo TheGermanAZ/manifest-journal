@@ -1,6 +1,6 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import Anthropic from "@anthropic-ai/sdk";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
@@ -61,8 +61,10 @@ export const analyzeEntry = action({
       throw new Error("Entry not found or not owned by user");
     }
 
-    const recentContext = args.recentEntryContents.length
-      ? `\nRECENT ENTRIES (last ${args.recentEntryContents.length}):\n${args.recentEntryContents
+    const recentEntries = args.recentEntryContents.slice(0, 10);
+
+    const recentContext = recentEntries.length
+      ? `\nRECENT ENTRIES (last ${recentEntries.length}):\n${recentEntries
           .map((e, i) => `[${i + 1}] ${e.slice(0, 300)}`)
           .join("\n\n")}`
       : "";
@@ -94,7 +96,18 @@ ${args.content}`,
 
     // Strip markdown code fences if present
     const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-    const parsed = JSON.parse(cleaned) as AnalysisResult;
+    let parsed: AnalysisResult;
+    try {
+      parsed = JSON.parse(cleaned) as AnalysisResult;
+    } catch {
+      parsed = {
+        patternInsight: "Unable to analyze this entry. Please try again.",
+        nudge: "What matters most to you right now?",
+        emotionalTone: "hopeful",
+        alignmentScore: 5,
+        alignmentRationale: "Analysis could not be completed.",
+      };
+    }
 
     // Validate emotional tone
     if (!EMOTIONAL_TONES.includes(parsed.emotionalTone)) {
@@ -105,7 +118,7 @@ ${args.content}`,
     parsed.alignmentScore = Math.max(1, Math.min(10, Math.round(parsed.alignmentScore)));
 
     // Store analysis on the entry
-    await ctx.runMutation(api.entries.updateEntryAnalysis, {
+    await ctx.runMutation(internal.entries.updateEntryAnalysis, {
       entryId: args.entryId,
       analysis: parsed,
     });
@@ -128,9 +141,14 @@ export const generateDailyPrompt = action({
     }),
     recentEntryContents: v.array(v.string()),
   },
-  handler: async (_ctx, args): Promise<string> => {
-    const recentContext = args.recentEntryContents.length
-      ? `\nRECENT ENTRIES:\n${args.recentEntryContents
+  handler: async (ctx, args): Promise<string> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const recentEntries = args.recentEntryContents.slice(0, 10);
+
+    const recentContext = recentEntries.length
+      ? `\nRECENT ENTRIES:\n${recentEntries
           .map((e, i) => `[${i + 1}] ${e.slice(0, 200)}`)
           .join("\n\n")}`
       : "";
@@ -177,13 +195,18 @@ export const conversationalTurn = action({
     ),
     userMessage: v.string(),
   },
-  handler: async (_ctx, args): Promise<string> => {
+  handler: async (ctx, args): Promise<string> => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const history = args.history.slice(-20);
+
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 200,
       system: `You are a manifestation coach. Dream profile:\n${formatDreamProfile(args.dreamProfile)}\n\nBe warm, probing, never preachy. Max 100 words. End with a question.`,
       messages: [
-        ...args.history.map((h) => ({
+        ...history.map((h) => ({
           role: h.role as "user" | "assistant",
           content: h.content,
         })),
