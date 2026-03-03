@@ -26,7 +26,7 @@ function HistoryPage() {
           </h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white"
+            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
           >
             Journal
           </button>

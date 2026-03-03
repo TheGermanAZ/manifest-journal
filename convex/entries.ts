@@ -72,6 +72,6 @@ export const recentEntries = query({
       .query("entries")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
-      .take(args.limit ?? 7);
+      .take(Math.min(args.limit ?? 7, 50));
   },
 });

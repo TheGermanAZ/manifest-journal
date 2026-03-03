@@ -211,6 +211,11 @@ a {
     transform 180ms ease;
 }
 
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
 .island-kicker {
   letter-spacing: 0.16em;
   text-transform: uppercase;

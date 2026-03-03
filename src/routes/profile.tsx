@@ -59,7 +59,7 @@ function ProfilePage() {
           <h1 className="text-lg font-semibold text-stone-900">Dream Profile</h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white"
+            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
           >
             Journal
           </button>
@@ -86,7 +86,7 @@ function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-stone-900 text-white text-sm font-medium py-3 rounded-xl disabled:opacity-40"
+          className="bg-stone-900 text-white text-sm font-medium py-3 rounded-xl disabled:opacity-40 hover:bg-stone-800"
         >
           {saved ? "Saved" : isSaving ? "Saving..." : "Save profile"}
         </button>

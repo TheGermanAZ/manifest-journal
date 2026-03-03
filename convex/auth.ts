@@ -1,13 +1,14 @@
 // convex/auth.ts
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
+import { convex, crossDomain } from "@convex-dev/better-auth/plugins";
 import { magicLink } from "better-auth/plugins";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 import authConfig from "./auth.config";
 
-const siteUrl = process.env.CONVEX_SITE_URL!;
+const convexSiteUrl = process.env.CONVEX_SITE_URL!;
+const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:3000";
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
@@ -17,9 +18,14 @@ export const createAuth = (
 ) => {
   return betterAuth({
     logger: { disabled: optionsOnly },
-    baseURL: siteUrl,
+    baseURL: convexSiteUrl,
     secret: process.env.BETTER_AUTH_SECRET,
+    trustedOrigins: [clientOrigin],
     database: authComponent.adapter(ctx),
+    account: {
+      storeStateStrategy: "database",
+      skipStateCookieCheck: true,
+    },
     socialProviders: {
       discord: {
         clientId: process.env.DISCORD_CLIENT_ID!,
@@ -28,8 +34,14 @@ export const createAuth = (
     },
     plugins: [
       convex({ authConfig }),
+      crossDomain({ siteUrl: clientOrigin }),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
+          const safeUrl = url
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
           const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
@@ -40,7 +52,7 @@ export const createAuth = (
               from: "Manifest Journal <noreply@manifestjournal.com>",
               to: email,
               subject: "Sign in to Manifest Journal",
-              html: `<p>Click <a href="${url}">here</a> to sign in to Manifest Journal.</p><p>If you didn't request this, you can safely ignore this email.</p>`,
+              html: `<p>Click <a href="${safeUrl}">here</a> to sign in to Manifest Journal.</p><p>If you didn't request this, you can safely ignore this email.</p>`,
             }),
           });
           if (!res.ok) {

@@ -1,6 +1,6 @@
 // convex/lib/authHelper.ts
 import { authComponent } from "../auth";
-import type { QueryCtx, MutationCtx, ActionCtx } from "../_generated/server";
+import type { QueryCtx, MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 
 /**
@@ -41,17 +41,4 @@ export async function requireAppUser(
     .unique();
   if (!user) throw new Error("User not provisioned");
   return user._id;
-}
-
-/**
- * Check if the current request is authenticated via Better Auth.
- * Works with any context type including ActionCtx.
- * Returns the Better Auth user ID (string) or null.
- * Uses safeGetAuthUser (does NOT throw).
- */
-export async function getBetterAuthUserId(
-  ctx: QueryCtx | MutationCtx | ActionCtx
-): Promise<string | null> {
-  const authUser = await authComponent.safeGetAuthUser(ctx);
-  return authUser?._id ?? null;
 }

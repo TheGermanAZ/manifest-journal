@@ -86,7 +86,7 @@ function OnboardingFlow() {
             <button
               onClick={() => setStep(2)}
               disabled={!canContinue}
-              className="self-end rounded-lg bg-stone-900 px-6 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="self-end rounded-lg bg-stone-900 px-6 py-2 text-sm font-medium text-white disabled:opacity-50 hover:bg-stone-800"
             >
               Continue &rarr;
             </button>
@@ -119,13 +119,13 @@ function OnboardingFlow() {
             <div className="flex justify-between">
               <button
                 onClick={() => setStep(1)}
-                className="rounded-lg border border-stone-300 px-6 py-2 text-sm font-medium text-stone-700"
+                className="rounded-lg border border-stone-300 px-6 py-2 text-sm font-medium text-stone-700 hover:border-stone-400"
               >
                 &larr; Back
               </button>
               <button
                 onClick={handleFinish}
-                className="rounded-lg bg-stone-900 px-6 py-2 text-sm font-medium text-white"
+                className="rounded-lg bg-stone-900 px-6 py-2 text-sm font-medium text-white hover:bg-stone-800"
               >
                 Start journaling &rarr;
               </button>
