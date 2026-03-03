@@ -44,8 +44,13 @@ function HomePage() {
   const navigate = useNavigate();
 
   // Redirect to onboarding if no dream profile
+  useEffect(() => {
+    if (user && !user.dreamProfile) {
+      navigate({ to: "/onboarding" });
+    }
+  }, [user, navigate]);
+
   if (user && !user.dreamProfile) {
-    navigate({ to: "/onboarding" });
     return null;
   }
 
@@ -109,7 +114,7 @@ function HomePage() {
       const assistantContent = await convoTurn({
         dreamProfile: user.dreamProfile,
         history,
-        message,
+        userMessage: message,
       });
 
       // Persist assistant turn

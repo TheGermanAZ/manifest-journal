@@ -2,6 +2,7 @@ import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 import Anthropic from "@anthropic-ai/sdk";
+import { getAuthUserId } from "@convex-dev/auth/server";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -48,6 +49,18 @@ export const analyzeEntry = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<AnalysisResult> => {
+    // Auth check: verify caller is authenticated before expensive API call
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Ownership check: verify the entry belongs to this user
+    const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
+    if (!entry) {
+      throw new Error("Entry not found or not owned by user");
+    }
+
     const recentContext = args.recentEntryContents.length
       ? `\nRECENT ENTRIES (last ${args.recentEntryContents.length}):\n${args.recentEntryContents
           .map((e, i) => `[${i + 1}] ${e.slice(0, 300)}`)
