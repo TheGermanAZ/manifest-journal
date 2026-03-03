@@ -41,6 +41,38 @@ export const currentUser = query({
   },
 });
 
+// One-off cleanup: delete old Convex Auth user records that lack betterAuthId.
+// Safe to remove this mutation after running it once.
+export const clearLegacyUsers = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const allUsers = await ctx.db.query("users").collect();
+    let deleted = 0;
+    for (const user of allUsers) {
+      if (!("betterAuthId" in user) || !user.betterAuthId) {
+        // Delete related entries and conversation turns first
+        const entries = await ctx.db
+          .query("entries")
+          .withIndex("by_user", (q) => q.eq("userId", user._id))
+          .collect();
+        for (const entry of entries) {
+          const turns = await ctx.db
+            .query("conversationTurns")
+            .withIndex("by_entry", (q) => q.eq("entryId", entry._id))
+            .collect();
+          for (const turn of turns) {
+            await ctx.db.delete(turn._id);
+          }
+          await ctx.db.delete(entry._id);
+        }
+        await ctx.db.delete(user._id);
+        deleted++;
+      }
+    }
+    return { deleted };
+  },
+});
+
 export const updateDreamProfile = mutation({
   args: {
     manifesto: v.string(),
