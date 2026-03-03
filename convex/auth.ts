@@ -5,6 +5,7 @@ import { magicLink } from "better-auth/plugins";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { betterAuth } from "better-auth";
+import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -26,7 +27,7 @@ export const createAuth = (
       },
     },
     plugins: [
-      convex(),
+      convex({ authConfig }),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
           const res = await fetch("https://api.resend.com/emails", {
