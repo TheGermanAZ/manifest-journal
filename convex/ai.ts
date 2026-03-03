@@ -2,7 +2,7 @@ import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import Anthropic from "@anthropic-ai/sdk";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { authComponent } from "./auth";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -49,11 +49,8 @@ export const analyzeEntry = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<AnalysisResult> => {
-    // Auth check: verify caller is authenticated before expensive API call
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
+    // Auth check: getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     // Ownership check: verify the entry belongs to this user
     const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
@@ -142,8 +139,8 @@ export const generateDailyPrompt = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<string> => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    // getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     const recentEntries = args.recentEntryContents.slice(0, 10);
 
@@ -196,8 +193,8 @@ export const conversationalTurn = action({
     userMessage: v.string(),
   },
   handler: async (ctx, args): Promise<string> => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    // getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     const history = args.history.slice(-20);
 

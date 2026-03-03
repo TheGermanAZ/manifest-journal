@@ -1,6 +1,7 @@
+// convex/entries.ts
 import { query, mutation, internalMutation } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { requireAppUser, getAppUserId } from "./lib/authHelper";
 
 export const createEntry = mutation({
   args: {
@@ -8,8 +9,7 @@ export const createEntry = mutation({
     mode: v.union(v.literal("open"), v.literal("guided"), v.literal("conversational")),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const userId = await requireAppUser(ctx);
     if (args.content.length > 50000) throw new Error("Content too long");
     return ctx.db.insert("entries", {
       userId,
@@ -42,7 +42,7 @@ export const updateEntryAnalysis = internalMutation({
 export const listEntries = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getAppUserId(ctx);
     if (!userId) return [];
     return ctx.db
       .query("entries")
@@ -55,7 +55,7 @@ export const listEntries = query({
 export const getEntry = query({
   args: { entryId: v.id("entries") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getAppUserId(ctx);
     if (!userId) return null;
     const entry = await ctx.db.get(args.entryId);
     if (!entry || entry.userId !== userId) return null;
@@ -66,7 +66,7 @@ export const getEntry = query({
 export const recentEntries = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getAppUserId(ctx);
     if (!userId) return [];
     return ctx.db
       .query("entries")

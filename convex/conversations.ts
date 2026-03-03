@@ -1,6 +1,7 @@
+// convex/conversations.ts
 import { mutation, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { requireAppUser, getAppUserId } from "./lib/authHelper";
 
 export const addTurn = mutation({
   args: {
@@ -9,8 +10,7 @@ export const addTurn = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const userId = await requireAppUser(ctx);
     const entry = await ctx.db.get(args.entryId);
     if (!entry || entry.userId !== userId) throw new Error("Not found");
     return ctx.db.insert("conversationTurns", {
@@ -25,7 +25,7 @@ export const addTurn = mutation({
 export const getTurns = query({
   args: { entryId: v.id("entries") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getAppUserId(ctx);
     if (!userId) return [];
     const entry = await ctx.db.get(args.entryId);
     if (!entry || entry.userId !== userId) return [];

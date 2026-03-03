@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { authClient } from "../lib/auth-client";
 import { useRef } from "react";
 import '../styles.css'
 
@@ -10,7 +11,9 @@ export const Route = createRootRoute({
 
 function Root() {
   const convex = useRef(
-    new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string)
+    new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string, {
+      expectAuth: true,
+    })
   ).current;
 
   return (
@@ -19,9 +22,9 @@ function Root() {
         <HeadContent />
       </head>
       <body>
-        <ConvexAuthProvider client={convex}>
+        <ConvexBetterAuthProvider client={convex} authClient={authClient}>
           <Outlet />
-        </ConvexAuthProvider>
+        </ConvexBetterAuthProvider>
         <Scripts />
       </body>
     </html>
