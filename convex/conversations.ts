@@ -1,6 +1,32 @@
+// convex/conversations.ts
 import { mutation, query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { authComponent } from "./auth";
+
+async function requireAppUser(ctx: any) {
+  const authUser = await authComponent.getAuthUser(ctx);
+  if (!authUser) throw new Error("Not authenticated");
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_better_auth_id", (q: any) =>
+      q.eq("betterAuthId", authUser.userId)
+    )
+    .unique();
+  if (!user) throw new Error("User not provisioned");
+  return user._id;
+}
+
+async function getAppUserId(ctx: any) {
+  const authUser = await authComponent.getAuthUser(ctx);
+  if (!authUser) return null;
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_better_auth_id", (q: any) =>
+      q.eq("betterAuthId", authUser.userId)
+    )
+    .unique();
+  return user?._id ?? null;
+}
 
 export const addTurn = mutation({
   args: {
@@ -9,8 +35,7 @@ export const addTurn = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
+    const userId = await requireAppUser(ctx);
     const entry = await ctx.db.get(args.entryId);
     if (!entry || entry.userId !== userId) throw new Error("Not found");
     return ctx.db.insert("conversationTurns", {
@@ -25,7 +50,7 @@ export const addTurn = mutation({
 export const getTurns = query({
   args: { entryId: v.id("entries") },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = await getAppUserId(ctx);
     if (!userId) return [];
     const entry = await ctx.db.get(args.entryId);
     if (!entry || entry.userId !== userId) return [];

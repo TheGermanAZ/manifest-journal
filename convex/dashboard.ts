@@ -1,15 +1,24 @@
+// convex/dashboard.ts
 import { query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { authComponent } from "./auth";
 
 export const dashboardStats = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
+    const authUser = await authComponent.getAuthUser(ctx);
+    if (!authUser) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_better_auth_id", (q) =>
+        q.eq("betterAuthId", authUser.userId)
+      )
+      .unique();
+    if (!user) return null;
 
     const entries = await ctx.db
       .query("entries")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .order("desc")
       .take(30);
 
