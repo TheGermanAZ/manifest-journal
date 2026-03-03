@@ -49,11 +49,8 @@ export const analyzeEntry = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<AnalysisResult> => {
-    // Auth check: verify caller is authenticated before expensive API call
-    const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) {
-      throw new Error("Not authenticated");
-    }
+    // Auth check: getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     // Ownership check: verify the entry belongs to this user
     const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
@@ -142,8 +139,8 @@ export const generateDailyPrompt = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<string> => {
-    const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new Error("Not authenticated");
+    // getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     const recentEntries = args.recentEntryContents.slice(0, 10);
 
@@ -196,8 +193,8 @@ export const conversationalTurn = action({
     userMessage: v.string(),
   },
   handler: async (ctx, args): Promise<string> => {
-    const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new Error("Not authenticated");
+    // getAuthUser throws if not authenticated
+    await authComponent.getAuthUser(ctx);
 
     const history = args.history.slice(-20);
 

@@ -1,32 +1,7 @@
 // convex/entries.ts
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
-import { authComponent } from "./auth";
-
-async function requireAppUser(ctx: any) {
-  const authUser = await authComponent.getAuthUser(ctx);
-  if (!authUser) throw new Error("Not authenticated");
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_better_auth_id", (q: any) =>
-      q.eq("betterAuthId", authUser.userId)
-    )
-    .unique();
-  if (!user) throw new Error("User not provisioned");
-  return user._id;
-}
-
-async function getAppUserId(ctx: any) {
-  const authUser = await authComponent.getAuthUser(ctx);
-  if (!authUser) return null;
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_better_auth_id", (q: any) =>
-      q.eq("betterAuthId", authUser.userId)
-    )
-    .unique();
-  return user?._id ?? null;
-}
+import { requireAppUser, getAppUserId } from "./lib/authHelper";
 
 export const createEntry = mutation({
   args: {

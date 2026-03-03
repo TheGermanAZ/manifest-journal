@@ -29,7 +29,7 @@ export const createAuth = (
       convex(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
-          await fetch("https://api.resend.com/emails", {
+          const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {
               Authorization: `Bearer ${process.env.AUTH_RESEND_KEY}`,
@@ -42,6 +42,10 @@ export const createAuth = (
               html: `<p>Click <a href="${url}">here</a> to sign in to Manifest Journal.</p><p>If you didn't request this, you can safely ignore this email.</p>`,
             }),
           });
+          if (!res.ok) {
+            const body = await res.text();
+            throw new Error(`Failed to send magic link email: ${res.status} ${body}`);
+          }
         },
       }),
     ],
