@@ -1,6 +1,6 @@
 // src/components/AuthGuard.tsx
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { authClient } from "../lib/auth-client";
@@ -9,12 +9,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = authClient.useSession();
   const navigate = useNavigate();
   const ensureUser = useMutation(api.users.ensureUser);
+  const hasProvisioned = useRef(false);
 
   const isAuthenticated = !!session;
 
-  // Provision app user on first authenticated load
+  // Provision app user on first authenticated load (once only)
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !hasProvisioned.current) {
+      hasProvisioned.current = true;
       ensureUser().catch((err) =>
         console.error("Failed to ensure user:", err)
       );

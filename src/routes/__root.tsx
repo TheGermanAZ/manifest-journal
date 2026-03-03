@@ -11,7 +11,9 @@ export const Route = createRootRoute({
 
 function Root() {
   const convex = useRef(
-    new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string)
+    new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string, {
+      expectAuth: true,
+    })
   ).current;
 
   return (

@@ -1,6 +1,6 @@
 // src/routes/login.tsx
-import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { authClient } from "../lib/auth-client";
 
 export const Route = createFileRoute("/login")({
@@ -16,10 +16,13 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Redirect if already authenticated
-  if (session && !isPending) {
-    navigate({ to: "/" });
-    return null;
-  }
+  useEffect(() => {
+    if (session && !isPending) {
+      navigate({ to: "/" });
+    }
+  }, [session, isPending, navigate]);
+
+  if (session && !isPending) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +42,7 @@ function LoginPage() {
   const handleDiscord = async () => {
     setError(null);
     try {
-      await authClient.signIn.social({ provider: "discord" });
+      await authClient.signIn.social({ provider: "discord", callbackURL: "/" });
     } catch (err) {
       console.error("Discord sign-in failed:", err);
       setError(err instanceof Error ? err.message : "Discord sign-in failed");
@@ -110,6 +113,15 @@ function LoginPage() {
               </svg>
               Continue with Discord
             </button>
+            <p className="text-sm text-stone-500">
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="font-medium text-stone-900 hover:underline"
+              >
+                Create one
+              </Link>
+            </p>
           </>
         )}
       </div>

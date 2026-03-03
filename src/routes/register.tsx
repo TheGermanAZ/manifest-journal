@@ -1,5 +1,5 @@
 // src/routes/register.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { authClient } from "../lib/auth-client";
 
@@ -15,10 +15,13 @@ function RegisterPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (session && !isPending) {
-    navigate({ to: "/" });
-    return null;
-  }
+  useEffect(() => {
+    if (session && !isPending) {
+      navigate({ to: "/" });
+    }
+  }, [session, isPending, navigate]);
+
+  if (session && !isPending) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +41,7 @@ function RegisterPage() {
   const handleDiscord = async () => {
     setError(null);
     try {
-      await authClient.signIn.social({ provider: "discord" });
+      await authClient.signIn.social({ provider: "discord", callbackURL: "/" });
     } catch (err) {
       console.error("Discord sign-in failed:", err);
       setError(err instanceof Error ? err.message : "Discord sign-in failed");

@@ -1,7 +1,12 @@
 import { createAPIFileRoute } from "@tanstack/react-start/api";
-import { reactStartHandler } from "@convex-dev/better-auth/react-start";
+import { convexBetterAuthReactStart } from "@convex-dev/better-auth/react-start";
+
+const { handler } = convexBetterAuthReactStart({
+  convexUrl: process.env.VITE_CONVEX_URL!,
+  convexSiteUrl: process.env.VITE_CONVEX_SITE_URL!,
+});
 
 export const Route = createAPIFileRoute("/api/auth/$")({
-  GET: ({ request }) => reactStartHandler(request),
-  POST: ({ request }) => reactStartHandler(request),
+  GET: ({ request }) => handler(request),
+  POST: ({ request }) => handler(request),
 });
