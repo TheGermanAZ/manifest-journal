@@ -1,7 +1,6 @@
 // convex/schema.ts
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { authTables } from "@convex-dev/auth/server";
 
 const emotionalToneValidator = v.union(
   v.literal("hopeful"),
@@ -21,10 +20,8 @@ const journalModeValidator = v.union(
 );
 
 export default defineSchema({
-  ...authTables,
-
   users: defineTable({
-    email: v.string(),
+    betterAuthId: v.string(),
     name: v.optional(v.string()),
     dreamProfile: v.optional(
       v.object({
@@ -38,7 +35,7 @@ export default defineSchema({
         }),
       })
     ),
-  }).index("by_email", ["email"]),
+  }).index("by_better_auth_id", ["betterAuthId"]),
 
   entries: defineTable({
     userId: v.id("users"),
