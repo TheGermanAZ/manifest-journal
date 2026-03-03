@@ -7,7 +7,7 @@ import type { DataModel } from "./_generated/dataModel";
 import { betterAuth } from "better-auth";
 import authConfig from "./auth.config";
 
-const siteUrl = process.env.SITE_URL!;
+const siteUrl = process.env.CONVEX_SITE_URL!;
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
