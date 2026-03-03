@@ -78,13 +78,13 @@ function ResponsePage() {
         <div className="flex gap-3">
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex-1 border border-stone-200 bg-white text-stone-700 text-sm font-medium py-3 rounded-xl"
+            className="flex-1 border border-stone-200 bg-white text-stone-700 text-sm font-medium py-3 rounded-xl hover:border-stone-400"
           >
             Done for today
           </button>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex-1 bg-stone-900 text-white text-sm font-medium py-3 rounded-xl"
+            className="flex-1 bg-stone-900 text-white text-sm font-medium py-3 rounded-xl hover:bg-stone-800"
           >
             Keep writing
           </button>

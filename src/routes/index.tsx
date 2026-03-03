@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState, useEffect } from "react";
-import { Id } from "../../convex/_generated/dataModel";
 import { AuthGuard } from "../components/AuthGuard";
 import { ModeSelector } from "../components/ModeSelector";
 import { ConversationView } from "../components/ConversationView";
+import { authClient } from "../lib/auth-client";
 
 export const Route = createFileRoute("/")({
   component: () => (
@@ -44,19 +44,16 @@ function HomePage() {
   const convoTurn = useAction(api.ai.conversationalTurn);
   const navigate = useNavigate();
 
+  const hasDreamProfile = !!user?.dreamProfile;
+
   // Redirect to onboarding if no dream profile
   useEffect(() => {
-    if (user && !user.dreamProfile) {
+    if (user && !hasDreamProfile) {
       navigate({ to: "/onboarding" });
     }
-  }, [user, navigate]);
-
-  if (user && !user.dreamProfile) {
-    return null;
-  }
+  }, [user, hasDreamProfile, navigate]);
 
   // Guided prompt: generate when entering guided mode
-  const hasDreamProfile = !!user?.dreamProfile;
   useEffect(() => {
     if (mode !== "guided" || !hasDreamProfile) return;
     let cancelled = false;
@@ -81,6 +78,10 @@ function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, hasDreamProfile]);
 
+  if (user && !hasDreamProfile) {
+    return null;
+  }
+
   // Conversational mode handlers
   const handleConvoSend = async (message: string) => {
     if (!user?.dreamProfile) return;
@@ -102,7 +103,7 @@ function HomePage() {
 
       // Persist user turn
       await addTurn({
-        entryId: entryId as Id<"entries">,
+        entryId: entryId as any,
         role: "user",
         content: message,
       });
@@ -120,7 +121,7 @@ function HomePage() {
 
       // Persist assistant turn
       await addTurn({
-        entryId: entryId as Id<"entries">,
+        entryId: entryId as any,
         role: "assistant",
         content: assistantContent,
       });
@@ -144,7 +145,7 @@ function HomePage() {
         .join("\n\n");
       const recentContents = (recent ?? []).map((e) => e.content);
       await analyzeEntry({
-        entryId: conversationEntryId as Id<"entries">,
+        entryId: conversationEntryId as any,
         content: fullContent,
         dreamProfile: user.dreamProfile,
         recentEntryContents: recentContents,
@@ -200,15 +201,24 @@ function HomePage() {
           <div className="flex gap-2">
             <button
               onClick={() => navigate({ to: "/history" })}
-              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white"
+              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
             >
               History
             </button>
             <button
               onClick={() => navigate({ to: "/dashboard" })}
-              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white"
+              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
             >
               Dashboard
+            </button>
+            <button
+              onClick={async () => {
+                await authClient.signOut();
+                navigate({ to: "/login" });
+              }}
+              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+            >
+              Sign out
             </button>
           </div>
         </div>
@@ -250,7 +260,7 @@ function HomePage() {
               <button
                 onClick={handleSubmit}
                 disabled={!content.trim() || isSubmitting}
-                className="bg-stone-900 text-white text-sm font-medium px-5 py-2 rounded-lg disabled:opacity-40"
+                className="bg-stone-900 text-white text-sm font-medium px-5 py-2 rounded-lg disabled:opacity-40 hover:bg-stone-800"
               >
                 {isSubmitting ? "Analyzing..." : "Submit"}
               </button>

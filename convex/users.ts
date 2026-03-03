@@ -1,5 +1,5 @@
 // convex/users.ts
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { authComponent } from "./auth";
 import { requireAppUser } from "./lib/authHelper";
@@ -42,8 +42,9 @@ export const currentUser = query({
 });
 
 // One-off cleanup: delete old Convex Auth user records that lack betterAuthId.
-// Safe to remove this mutation after running it once.
-export const clearLegacyUsers = mutation({
+// Run via dashboard: `bunx convex run users:clearLegacyUsers`
+// Safe to remove after running once.
+export const clearLegacyUsers = internalMutation({
   args: {},
   handler: async (ctx) => {
     const allUsers = await ctx.db.query("users").collect();

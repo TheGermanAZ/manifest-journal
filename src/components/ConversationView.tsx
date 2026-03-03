@@ -112,7 +112,7 @@ export function ConversationView({
         <button
           onClick={handleSend}
           disabled={!input.trim() || isLoading}
-          className="bg-stone-900 text-white text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-40"
+          className="bg-stone-900 text-white text-sm font-medium px-4 py-1.5 rounded-lg disabled:opacity-40 hover:bg-stone-800"
         >
           Send
         </button>

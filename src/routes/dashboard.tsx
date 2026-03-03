@@ -40,7 +40,7 @@ function DashboardPage() {
           <h1 className="text-lg font-semibold text-stone-900">Momentum</h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white"
+            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
           >
             Journal
           </button>
@@ -102,7 +102,7 @@ function DashboardPage() {
         {/* Profile link */}
         <button
           onClick={() => navigate({ to: "/profile" })}
-          className="text-sm text-stone-500 underline underline-offset-2 text-center"
+          className="text-sm text-stone-500 underline underline-offset-2 text-center hover:text-stone-700"
         >
           View &amp; edit dream profile
         </button>
