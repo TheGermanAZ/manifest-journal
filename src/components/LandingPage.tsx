@@ -33,7 +33,7 @@ export function LandingPage() {
           className="island-kicker rise-in mb-5"
           style={{ animationDelay: "100ms" }}
         >
-          AI-Powered Journaling
+          Manifest Journal
         </p>
 
         <h1

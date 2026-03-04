@@ -20,7 +20,7 @@ describe("LandingPage", () => {
 
   it("renders the kicker text", () => {
     render(<LandingPage />);
-    expect(screen.getByText("AI-Powered Journaling")).toBeInTheDocument();
+    expect(screen.getByText("Manifest Journal")).toBeInTheDocument();
   });
 
   it("renders all three feature cards", () => {
