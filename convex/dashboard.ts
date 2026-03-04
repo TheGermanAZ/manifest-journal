@@ -34,7 +34,7 @@ export const dashboardStats = query({
   },
 });
 
-function calculateStreak(entries: Array<{ _creationTime: number }>): number {
+export function calculateStreak(entries: Array<{ _creationTime: number }>): number {
   if (entries.length === 0) return 0;
 
   // Deduplicate to unique calendar days (entries are already sorted desc)
