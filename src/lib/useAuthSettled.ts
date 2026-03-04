@@ -14,13 +14,13 @@ import { authClient } from "./auth-client";
 export function useAuthSettled() {
   const { data: session, isPending } = authClient.useSession();
   const [mounted, setMounted] = useState(false);
-  const [ottPending, setOttPending] = useState(false);
+  const [ottPending, setOttPending] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("ott"),
+  );
 
-  // Detect ott param on client mount only (SSR has no window)
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has("ott")) {
-      setOttPending(true);
-    }
     setMounted(true);
   }, []);
 

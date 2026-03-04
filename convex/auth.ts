@@ -20,7 +20,7 @@ export const createAuth = (
     logger: { disabled: optionsOnly },
     baseURL: convexSiteUrl,
     secret: process.env.BETTER_AUTH_SECRET,
-    trustedOrigins: [clientOrigin],
+    trustedOrigins: [clientOrigin, "https://*.vercel.app"],
     database: authComponent.adapter(ctx),
     account: {
       storeStateStrategy: "database",
