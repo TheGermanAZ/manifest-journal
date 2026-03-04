@@ -1,12 +1,15 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { authComponent } from "./auth";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
 });
+
+const MODEL = "google/gemini-3.1-flash-lite-preview";
 
 const EMOTIONAL_TONES = [
   "hopeful", "anxious", "stuck", "clear",
@@ -49,10 +52,8 @@ export const analyzeEntry = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<AnalysisResult> => {
-    // Auth check: getAuthUser throws if not authenticated
     await authComponent.getAuthUser(ctx);
 
-    // Ownership check: verify the entry belongs to this user
     const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
     if (!entry) {
       throw new Error("Entry not found or not owned by user");
@@ -66,11 +67,14 @@ export const analyzeEntry = action({
           .join("\n\n")}`
       : "";
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: MODEL,
       max_tokens: 512,
-      system: `You are a manifestation coach. The user's dream life profile is:\n\n${formatDreamProfile(args.dreamProfile)}${recentContext}\n\nAnalyze journal entries and return JSON only. No explanation outside the JSON.`,
       messages: [
+        {
+          role: "system",
+          content: `You are a manifestation coach. The user's dream life profile is:\n\n${formatDreamProfile(args.dreamProfile)}${recentContext}\n\nAnalyze journal entries and return JSON only. No explanation outside the JSON.`,
+        },
         {
           role: "user",
           content: `Analyze this journal entry. Return ONLY valid JSON matching this exact shape:
@@ -88,8 +92,7 @@ ${args.content}`,
       ],
     });
 
-    const text =
-      message.content[0].type === "text" ? message.content[0].text : "{}";
+    const text = response.choices[0]?.message?.content ?? "{}";
 
     // Strip markdown code fences if present
     const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
@@ -139,7 +142,6 @@ export const generateDailyPrompt = action({
     recentEntryContents: v.array(v.string()),
   },
   handler: async (ctx, args): Promise<string> => {
-    // getAuthUser throws if not authenticated
     await authComponent.getAuthUser(ctx);
 
     const recentEntries = args.recentEntryContents.slice(0, 10);
@@ -150,11 +152,14 @@ export const generateDailyPrompt = action({
           .join("\n\n")}`
       : "";
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: MODEL,
       max_tokens: 100,
-      system: `You are a manifestation coach. Dream profile:\n${formatDreamProfile(args.dreamProfile)}${recentContext}`,
       messages: [
+        {
+          role: "system",
+          content: `You are a manifestation coach. Dream profile:\n${formatDreamProfile(args.dreamProfile)}${recentContext}`,
+        },
         {
           role: "user",
           content: `Generate one journaling prompt (max 50 words) that:
@@ -166,9 +171,8 @@ Return ONLY the prompt text. Nothing else.`,
       ],
     });
 
-    return message.content[0].type === "text"
-      ? message.content[0].text.trim()
-      : "What would the person you're becoming do differently today?";
+    return response.choices[0]?.message?.content?.trim()
+      ?? "What would the person you're becoming do differently today?";
   },
 });
 
@@ -193,16 +197,18 @@ export const conversationalTurn = action({
     userMessage: v.string(),
   },
   handler: async (ctx, args): Promise<string> => {
-    // getAuthUser throws if not authenticated
     await authComponent.getAuthUser(ctx);
 
     const history = args.history.slice(-20);
 
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: MODEL,
       max_tokens: 200,
-      system: `You are a manifestation coach. Dream profile:\n${formatDreamProfile(args.dreamProfile)}\n\nBe warm, probing, never preachy. Max 100 words. End with a question.`,
       messages: [
+        {
+          role: "system",
+          content: `You are a manifestation coach. Dream profile:\n${formatDreamProfile(args.dreamProfile)}\n\nBe warm, probing, never preachy. Max 100 words. End with a question.`,
+        },
         ...history.map((h) => ({
           role: h.role as "user" | "assistant",
           content: h.content,
@@ -211,8 +217,7 @@ export const conversationalTurn = action({
       ],
     });
 
-    return message.content[0].type === "text"
-      ? message.content[0].text.trim()
-      : "Tell me more about that.";
+    return response.choices[0]?.message?.content?.trim()
+      ?? "Tell me more about that.";
   },
 });
