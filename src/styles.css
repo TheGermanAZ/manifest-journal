@@ -280,3 +280,120 @@ button,
     transform: translateY(0);
   }
 }
+
+/* ── Landing page ──────────────────────────── */
+
+.landing-page {
+  overflow-x: hidden;
+}
+
+/* Decorative gradient orb behind hero headline */
+.landing-orb {
+  position: absolute;
+  width: 640px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in oklab, var(--lagoon) 22%, transparent),
+    color-mix(in oklab, var(--palm) 8%, transparent) 60%,
+    transparent 100%
+  );
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+}
+
+/* Primary CTA button */
+.landing-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  border-radius: 12px;
+  color: white;
+  background: linear-gradient(160deg, var(--lagoon-deep), var(--palm));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 8px 24px rgba(47, 106, 74, 0.22),
+    0 2px 8px rgba(23, 58, 64, 0.12);
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+
+.landing-cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 12px 32px rgba(47, 106, 74, 0.28),
+    0 4px 12px rgba(23, 58, 64, 0.14);
+  filter: brightness(1.06);
+  color: white;
+}
+
+.landing-cta-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary CTA link */
+.landing-cta-secondary {
+  font-size: 0.85rem;
+  color: var(--sea-ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.landing-cta-secondary:hover {
+  color: var(--lagoon-deep);
+  border-bottom-color: var(--lagoon-deep);
+}
+
+/* Scroll hint bounce */
+.landing-scroll-hint {
+  display: inline-block;
+  animation: landing-bounce 2.4s ease-in-out infinite;
+}
+
+@keyframes landing-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+/* Feature cards — scroll-triggered reveal */
+.landing-feature-reveal {
+  animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Feature icon subtle float */
+.landing-feature-icon {
+  display: inline-block;
+  animation: landing-float 4s ease-in-out infinite;
+}
+
+@keyframes landing-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Closing section — soft tinted backdrop */
+.landing-closing {
+  position: relative;
+  background: color-mix(in oklab, var(--sand) 50%, transparent);
+  border-top: 1px solid var(--line);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .landing-orb {
+    width: 360px;
+    height: 280px;
+    filter: blur(60px);
+  }
+}

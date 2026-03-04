@@ -2,18 +2,33 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState, useEffect } from "react";
-import { AuthGuard } from "../components/AuthGuard";
 import { ModeSelector } from "../components/ModeSelector";
 import { ConversationView } from "../components/ConversationView";
+import { LandingPage } from "../components/LandingPage";
 import { authClient } from "../lib/auth-client";
+import { useAuthSettled } from "../lib/useAuthSettled";
 
 export const Route = createFileRoute("/")({
-  component: () => (
-    <AuthGuard>
-      <HomePage />
-    </AuthGuard>
-  ),
+  component: IndexPage,
 });
+
+function IndexPage() {
+  const { isAuthenticated, isPending } = useAuthSettled();
+
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="animate-pulse text-stone-400 text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LandingPage />;
+  }
+
+  return <HomePage />;
+}
 
 type JournalMode = "open" | "guided" | "conversational";
 

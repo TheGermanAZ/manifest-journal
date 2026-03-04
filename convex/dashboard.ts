@@ -36,18 +36,30 @@ export const dashboardStats = query({
 
 function calculateStreak(entries: Array<{ _creationTime: number }>): number {
   if (entries.length === 0) return 0;
-  let streak = 0;
+
+  // Deduplicate to unique calendar days (entries are already sorted desc)
+  const uniqueDays: Date[] = [];
+  for (const entry of entries) {
+    const d = new Date(entry._creationTime);
+    d.setHours(0, 0, 0, 0);
+    if (uniqueDays.length === 0 || uniqueDays[uniqueDays.length - 1].getTime() !== d.getTime()) {
+      uniqueDays.push(d);
+    }
+  }
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  let current = today;
+  const ONE_DAY = 1000 * 60 * 60 * 24;
 
-  for (const entry of entries) {
-    const entryDate = new Date(entry._creationTime);
-    entryDate.setHours(0, 0, 0, 0);
-    const diff = (current.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24);
-    if (diff <= 1) {
+  // The most recent journaled day must be today or yesterday to have an active streak
+  const gapToMostRecent = (today.getTime() - uniqueDays[0].getTime()) / ONE_DAY;
+  if (gapToMostRecent > 1) return 0;
+
+  let streak = 1;
+  for (let i = 1; i < uniqueDays.length; i++) {
+    const diff = (uniqueDays[i - 1].getTime() - uniqueDays[i].getTime()) / ONE_DAY;
+    if (diff === 1) {
       streak++;
-      current = entryDate;
     } else {
       break;
     }
