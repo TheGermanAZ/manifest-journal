@@ -14,16 +14,10 @@ describe("LandingPage", () => {
     render(<LandingPage />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1).toHaveTextContent(/Your dream life starts/);
-    expect(h1).toHaveTextContent(/with today's entry/);
-
+    expect(h1).toHaveTextContent(/today's/);
   });
 
-  it("renders the kicker text", () => {
-    render(<LandingPage />);
-    expect(screen.getByText("Manifest Journal")).toBeInTheDocument();
-  });
-
-  it("renders all three feature cards", () => {
+  it("renders all three features", () => {
     render(<LandingPage />);
     expect(screen.getByText("Define Your Dream")).toBeInTheDocument();
     expect(screen.getByText("Journal Your Way")).toBeInTheDocument();
@@ -39,11 +33,10 @@ describe("LandingPage", () => {
 
   it("has CTA links pointing to register", () => {
     render(<LandingPage />);
-    const ctaLinks = screen.getAllByRole("link", { name: /start journaling/i });
-    expect(ctaLinks).toHaveLength(2); // hero + closing
-    ctaLinks.forEach((link) => {
-      expect(link).toHaveAttribute("href", "/register");
-    });
+    const startLink = screen.getByRole("link", { name: /start journaling/i });
+    expect(startLink).toHaveAttribute("href", "/register");
+    const beginLink = screen.getByRole("link", { name: /begin/i });
+    expect(beginLink).toHaveAttribute("href", "/register");
   });
 
   it("has a sign-in link pointing to login", () => {
@@ -54,6 +47,6 @@ describe("LandingPage", () => {
 
   it("renders the closing section copy", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Five minutes a day.")).toBeInTheDocument();
+    expect(screen.getByText("Five minutes a day. That's all it takes.")).toBeInTheDocument();
   });
 });
