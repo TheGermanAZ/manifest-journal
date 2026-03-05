@@ -1,6 +1,7 @@
 // convex/users.ts
 import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { authComponent } from "./auth";
 import { requireAppUser } from "./lib/authHelper";
 
@@ -74,6 +75,21 @@ export const clearLegacyUsers = internalMutation({
   },
 });
 
+export const updatePreferences = mutation({
+  args: {
+    graceDaysPerWeek: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await requireAppUser(ctx);
+    if (args.graceDaysPerWeek < 0 || args.graceDaysPerWeek > 2) {
+      throw new Error("Grace days must be 0, 1, or 2");
+    }
+    await ctx.db.patch(userId, {
+      preferences: { graceDaysPerWeek: args.graceDaysPerWeek },
+    });
+  },
+});
+
 export const updateDreamProfile = mutation({
   args: {
     manifesto: v.string(),
@@ -91,6 +107,34 @@ export const updateDreamProfile = mutation({
     if (args.manifesto.length > 5000) throw new Error("Manifesto too long");
     for (const [key, value] of Object.entries(args.categories)) {
       if (value.length > 2000) throw new Error(`Category ${key} too long`);
+    }
+
+    // Before patching, snapshot the current profile for evolution tracking
+    const user = await ctx.db.get(userId);
+    if (user?.dreamProfile) {
+      const changedFields: string[] = [];
+      if (user.dreamProfile.manifesto !== args.manifesto) {
+        changedFields.push("manifesto");
+      }
+      for (const key of Object.keys(args.categories) as Array<
+        keyof typeof args.categories
+      >) {
+        if (user.dreamProfile.categories[key] !== args.categories[key]) {
+          changedFields.push(key);
+        }
+      }
+      if (changedFields.length > 0) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.dreamProfileVersions.snapshotCurrentProfile,
+          {
+            userId,
+            manifesto: user.dreamProfile.manifesto,
+            categories: user.dreamProfile.categories,
+            changedFields,
+          }
+        );
+      }
     }
 
     await ctx.db.patch(userId, {

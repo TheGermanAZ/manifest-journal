@@ -11,11 +11,20 @@
 import type * as ai from "../ai.js";
 import type * as auth from "../auth.js";
 import type * as conversations from "../conversations.js";
+import type * as crons from "../crons.js";
 import type * as dashboard from "../dashboard.js";
+import type * as dreamProfileVersions from "../dreamProfileVersions.js";
 import type * as entries from "../entries.js";
+import type * as export_ from "../export.js";
 import type * as http from "../http.js";
 import type * as lib_authHelper from "../lib/authHelper.js";
+import type * as milestones from "../milestones.js";
+import type * as notifications from "../notifications.js";
+import type * as pathSeedData from "../pathSeedData.js";
+import type * as paths from "../paths.js";
+import type * as search from "../search.js";
 import type * as users from "../users.js";
+import type * as weeklySummary from "../weeklySummary.js";
 
 import type {
   ApiFromModules,
@@ -27,11 +36,20 @@ declare const fullApi: ApiFromModules<{
   ai: typeof ai;
   auth: typeof auth;
   conversations: typeof conversations;
+  crons: typeof crons;
   dashboard: typeof dashboard;
+  dreamProfileVersions: typeof dreamProfileVersions;
   entries: typeof entries;
+  export: typeof export_;
   http: typeof http;
   "lib/authHelper": typeof lib_authHelper;
+  milestones: typeof milestones;
+  notifications: typeof notifications;
+  pathSeedData: typeof pathSeedData;
+  paths: typeof paths;
+  search: typeof search;
   users: typeof users;
+  weeklySummary: typeof weeklySummary;
 }>;
 
 /**

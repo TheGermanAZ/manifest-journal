@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ModeSelector } from "../components/ModeSelector";
+import { MoodCheckIn } from "../components/MoodCheckIn";
 import { ConversationView } from "../components/ConversationView";
+import { PathProgressBanner } from "../components/PathProgressBanner";
 import { LandingPage } from "../components/LandingPage";
 import { authClient } from "../lib/auth-client";
 import { useAuthSettled } from "../lib/useAuthSettled";
@@ -34,8 +36,10 @@ type JournalMode = "open" | "guided" | "conversational";
 
 function HomePage() {
   const [mode, setMode] = useState<JournalMode>("open");
+  const [showCheckIn, setShowCheckIn] = useState(false);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const writingStartedAt = useRef<number | null>(null);
 
   // Guided prompt state
   const [guidedPrompt, setGuidedPrompt] = useState<string | null>(null);
@@ -52,9 +56,12 @@ function HomePage() {
 
   const user = useQuery(api.users.currentUser);
   const recent = useQuery(api.entries.recentEntries, { limit: 7 });
+  const activePath = useQuery(api.paths.getActivePath);
   const createEntry = useMutation(api.entries.createEntry);
   const analyzeEntry = useAction(api.ai.analyzeEntry);
   const generatePrompt = useAction(api.ai.generateDailyPrompt);
+  const completeDayAndAdvance = useMutation(api.paths.completeDayAndAdvance);
+  const abandonPath = useMutation(api.paths.abandonPath);
   const addTurn = useMutation(api.conversations.addTurn);
   const convoTurn = useAction(api.ai.conversationalTurn);
   const navigate = useNavigate();
@@ -68,19 +75,43 @@ function HomePage() {
     }
   }, [user, hasDreamProfile, navigate]);
 
-  // Guided prompt: generate when entering guided mode
+  // Derive current path prompt if on an active path
+  const currentPathPrompt = activePath
+    ? activePath.path.prompts.find(
+        (p: { day: number; prompt: string }) => p.day === activePath.progress.currentDay,
+      )?.prompt ?? null
+    : null;
+
+  // Auto-select guided mode when on an active path
+  useEffect(() => {
+    if (activePath && mode !== "guided") {
+      setMode("guided");
+    }
+    // Only trigger when activePath changes, not mode
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePath]);
+
+  // Guided prompt: use path prompt if active, otherwise generate via AI
   useEffect(() => {
     if (mode !== "guided" || !hasDreamProfile) return;
+    // If on an active path, use the path prompt instead of AI-generated
+    if (currentPathPrompt) {
+      setGuidedPrompt(currentPathPrompt);
+      return;
+    }
     let cancelled = false;
     (async () => {
       setIsLoadingPrompt(true);
       try {
-        const recentContents = (recent ?? [])
-          .slice(0, 3)
-          .map((e) => e.content);
+        const recentForPrompt = (recent ?? []).slice(0, 3).map((e) => ({
+          content: e.content,
+          date: new Date(e._creationTime).toISOString().split("T")[0],
+          tone: e.analysis?.emotionalTone,
+          alignmentScore: e.analysis?.alignmentScore,
+        }));
         const prompt = await generatePrompt({
           dreamProfile: user!.dreamProfile!,
-          recentEntryContents: recentContents,
+          recentEntries: recentForPrompt,
         });
         if (!cancelled) setGuidedPrompt(prompt);
       } finally {
@@ -91,7 +122,7 @@ function HomePage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, hasDreamProfile]);
+  }, [mode, hasDreamProfile, currentPathPrompt]);
 
   if (user && !hasDreamProfile) {
     return null;
@@ -109,10 +140,15 @@ function HomePage() {
 
       // On first message, create the entry
       if (!entryId) {
+        const writingDurationMs = writingStartedAt.current
+          ? Date.now() - writingStartedAt.current
+          : undefined;
         entryId = await createEntry({
           content: message,
           mode: "conversational",
+          writingDurationMs,
         });
+        writingStartedAt.current = null;
         setConversationEntryId(entryId);
       }
 
@@ -158,12 +194,17 @@ function HomePage() {
         .filter((t) => t.role === "user")
         .map((t) => t.content)
         .join("\n\n");
-      const recentContents = (recent ?? []).map((e) => e.content);
+      const recentForAnalysis = (recent ?? []).map((e) => ({
+        content: e.content,
+        date: new Date(e._creationTime).toISOString().split("T")[0],
+        tone: e.analysis?.emotionalTone,
+        alignmentScore: e.analysis?.alignmentScore,
+      }));
       await analyzeEntry({
         entryId: conversationEntryId as any,
         content: fullContent,
         dreamProfile: user.dreamProfile,
-        recentEntryContents: recentContents,
+        recentEntries: recentForAnalysis,
       });
       navigate({
         to: "/response/$entryId",
@@ -178,14 +219,32 @@ function HomePage() {
     if (!content.trim() || !user?.dreamProfile) return;
     setIsSubmitting(true);
     try {
-      const entryId = await createEntry({ content, mode });
-      const recentContents = (recent ?? []).map((e) => e.content);
+      const writingDurationMs = writingStartedAt.current
+        ? Date.now() - writingStartedAt.current
+        : undefined;
+      const entryId = await createEntry({ content, mode, writingDurationMs });
+      writingStartedAt.current = null;
+      const recentForAnalysis = (recent ?? []).map((e) => ({
+        content: e.content,
+        date: new Date(e._creationTime).toISOString().split("T")[0],
+        tone: e.analysis?.emotionalTone,
+        alignmentScore: e.analysis?.alignmentScore,
+      }));
       await analyzeEntry({
         entryId,
         content,
         dreamProfile: user.dreamProfile,
-        recentEntryContents: recentContents,
+        recentEntries: recentForAnalysis,
       });
+
+      // Advance path progress if on an active path
+      if (activePath) {
+        await completeDayAndAdvance({
+          progressId: activePath.progress._id as any,
+          entryId: entryId as any,
+        });
+      }
+
       navigate({ to: "/response/$entryId", params: { entryId } });
     } finally {
       setIsSubmitting(false);
@@ -221,6 +280,18 @@ function HomePage() {
               History
             </button>
             <button
+              onClick={() => navigate({ to: "/weekly" })}
+              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => navigate({ to: "/paths" })}
+              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+            >
+              Paths
+            </button>
+            <button
               onClick={() => navigate({ to: "/dashboard" })}
               className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
@@ -239,15 +310,39 @@ function HomePage() {
         </div>
 
         {/* Mode selector */}
-        <ModeSelector selected={mode} onSelect={setMode} />
+        <ModeSelector
+          selected={mode}
+          onSelect={(m) => { setMode(m); setShowCheckIn(false); }}
+          pathInfo={activePath ? { currentDay: activePath.progress.currentDay, totalDays: activePath.path.duration } : null}
+          showCheckIn={showCheckIn}
+          onCheckInToggle={() => setShowCheckIn(!showCheckIn)}
+        />
 
-        {/* Editor / Conversation */}
-        {mode === "conversational" ? (
+        {/* Active path banner */}
+        {activePath && currentPathPrompt && (
+          <PathProgressBanner
+            pathName={activePath.path.name}
+            currentDay={activePath.progress.currentDay}
+            totalDays={activePath.path.duration}
+            prompt={currentPathPrompt}
+            onAbandon={() =>
+              abandonPath({ progressId: activePath.progress._id as any })
+            }
+          />
+        )}
+
+        {/* Editor / Conversation / Check-in */}
+        {showCheckIn ? (
+          <MoodCheckIn />
+        ) : mode === "conversational" ? (
           <ConversationView
             turns={turns}
             onSend={handleConvoSend}
             isLoading={isTurnLoading}
             onFinish={handleConvoFinish}
+            onStartWriting={() => {
+              if (!writingStartedAt.current) writingStartedAt.current = Date.now();
+            }}
           />
         ) : (
           <div className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-5 flex flex-col gap-4">
@@ -265,7 +360,10 @@ function HomePage() {
             )}
             <textarea
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => {
+                if (!writingStartedAt.current) writingStartedAt.current = Date.now();
+                setContent(e.target.value);
+              }}
               placeholder="What's on your mind today?"
               rows={12}
               className="w-full resize-none text-[var(--ink)] text-sm leading-relaxed bg-transparent focus:outline-none placeholder:text-[var(--ink-light)] placeholder:opacity-50"

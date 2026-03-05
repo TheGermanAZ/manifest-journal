@@ -5,6 +5,9 @@ import { useState, useEffect } from "react";
 import { AuthGuard } from "../components/AuthGuard";
 import { ManifestoEditor } from "../components/ManifestoEditor";
 import { CategoryCard } from "../components/CategoryCard";
+import { GraceDaySelector } from "../components/GraceDaySelector";
+import { NotificationSettings } from "../components/NotificationSettings";
+import { ProfileTimeline } from "../components/ProfileTimeline";
 
 export const Route = createFileRoute("/profile")({
   component: () => (
@@ -81,6 +84,21 @@ function ProfilePage() {
               onChange={(val) => setCategories((c) => ({ ...c, [key]: val }))}
             />
           ))}
+        </div>
+
+        {/* Streak preferences */}
+        <div className="border-t border-[rgba(26,26,26,0.12)] pt-6">
+          <GraceDaySelector />
+        </div>
+
+        {/* Notification settings */}
+        <div className="border-t border-[rgba(26,26,26,0.12)] pt-6">
+          <NotificationSettings />
+        </div>
+
+        {/* Profile evolution timeline */}
+        <div className="border-t border-[rgba(26,26,26,0.12)] pt-6">
+          <ProfileTimeline />
         </div>
 
         <button

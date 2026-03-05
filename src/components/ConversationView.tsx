@@ -10,6 +10,7 @@ interface ConversationViewProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   onFinish: () => void;
+  onStartWriting?: () => void;
 }
 
 export function ConversationView({
@@ -17,6 +18,7 @@ export function ConversationView({
   onSend,
   isLoading,
   onFinish,
+  onStartWriting,
 }: ConversationViewProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -103,7 +105,10 @@ export function ConversationView({
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            if (!input && e.target.value && onStartWriting) onStartWriting();
+            setInput(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Type a message..."
           disabled={isLoading}
