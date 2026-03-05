@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { Route } from "./index";
+import { Route } from "./routes/index";
 
-vi.mock("../lib/useAuthSettled", () => ({
+vi.mock("./lib/useAuthSettled", () => ({
   useAuthSettled: vi.fn(),
 }));
-vi.mock("../components/LandingPage", () => ({
+vi.mock("./components/LandingPage", () => ({
   LandingPage: () => (
     <main>
       <h1>Your dream life starts</h1>
@@ -13,7 +13,7 @@ vi.mock("../components/LandingPage", () => ({
   ),
 }));
 
-import { useAuthSettled } from "../lib/useAuthSettled";
+import { useAuthSettled } from "./lib/useAuthSettled";
 
 const IndexPage = Route.options.component as () => JSX.Element;
 
@@ -58,3 +58,4 @@ describe("index route auth state handling", () => {
     });
   });
 });
+
