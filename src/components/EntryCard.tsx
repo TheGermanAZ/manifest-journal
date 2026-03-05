@@ -66,22 +66,22 @@ export function EntryCard({ entry, onClick }: EntryCardProps) {
       >
         {/* Date column */}
         <div className="flex flex-col items-center min-w-[40px]">
-          <span className="text-xs uppercase text-[var(--ink-light)] font-medium">
+          <span className="text-sm uppercase text-[var(--ink-light)] font-medium">
             {month}
           </span>
-          <span className="text-lg font-semibold text-[var(--ink)]">{day}</span>
+          <span className="text-xl font-semibold text-[var(--ink)]">{day}</span>
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0 flex flex-col gap-2">
           {isCheckIn && !entry.content ? (
-            <p className="text-sm text-[var(--ink-light)] italic">Mood check-in</p>
+            <p className="text-base text-[var(--ink-light)] italic">Mood check-in</p>
           ) : (
-            <p className="text-sm text-[var(--ink)] leading-relaxed pr-6">{preview}</p>
+            <p className="text-base text-[var(--ink)] leading-relaxed pr-6">{preview}</p>
           )}
 
           {entry.wordCount !== undefined && (
-            <span className="text-xs text-[var(--ink-light)] opacity-60">
+            <span className="text-sm text-[var(--ink-light)] opacity-60">
               {entry.wordCount} words
             </span>
           )}
@@ -90,21 +90,21 @@ export function EntryCard({ entry, onClick }: EntryCardProps) {
             <div className="flex items-center gap-2 flex-wrap">
               {/* Alignment score badge */}
               <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${scoreColorClass(analysis.alignmentScore)}`}
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-sm font-medium ${scoreColorClass(analysis.alignmentScore)}`}
               >
                 {analysis.alignmentScore}/10
               </span>
 
               {/* Emotional tone pill */}
               <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${toneClass}`}
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-sm font-medium ${toneClass}`}
               >
                 {analysis.emotionalTone}
               </span>
 
               {/* Breakthrough badge */}
               {isBreakthrough && (
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700">
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-sm font-medium bg-amber-100 text-amber-700">
                   Breakthrough
                 </span>
               )}

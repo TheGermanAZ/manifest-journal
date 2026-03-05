@@ -5,13 +5,13 @@ const features = [
     num: "一",
     title: "Define Your Dream",
     description:
-      "Write your manifesto and set intentions across five life dimensions. Your AI coach uses this as your north star.",
+      "Write your manifesto and set intentions across five life dimensions. Your coach uses this as your north star.",
   },
   {
     num: "二",
     title: "Journal Your Way",
     description:
-      "Free write, follow AI-generated prompts, or have a real conversation with your coach. Three modes that meet you where you are.",
+      "Free write, follow coach-generated prompts, or have a real conversation with your coach. Three modes that meet you where you are.",
   },
   {
     num: "三",

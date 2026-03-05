@@ -10,7 +10,7 @@ interface ModeSelectorProps {
 
 const modes: { value: JournalMode; label: string; description: string }[] = [
   { value: "open", label: "Open Canvas", description: "Write freely" },
-  { value: "guided", label: "Guided", description: "AI gives you a prompt" },
+  { value: "guided", label: "Guided", description: "Coach gives you a prompt" },
   {
     value: "conversational",
     label: "Conversational",
@@ -35,10 +35,10 @@ export function ModeSelector({ selected, onSelect, pathInfo, showCheckIn, onChec
             }`}
           >
             <span className="flex items-center gap-1.5">
-              <span className="text-sm font-medium">{m.label}</span>
+              <span className="text-base font-medium">{m.label}</span>
               {showPathBadge && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  className={`text-xs px-1.5 py-0.5 rounded-full ${
                     isSelected
                       ? "bg-[var(--vermillion)] text-[var(--paper)]"
                       : "bg-[rgba(194,59,34,0.1)] text-[var(--vermillion)]"
@@ -49,7 +49,7 @@ export function ModeSelector({ selected, onSelect, pathInfo, showCheckIn, onChec
               )}
             </span>
             <span
-              className={`block text-xs mt-0.5 ${
+              className={`block text-sm mt-0.5 ${
                 isSelected ? "opacity-50" : "text-[var(--ink-light)]"
               }`}
             >
@@ -67,9 +67,9 @@ export function ModeSelector({ selected, onSelect, pathInfo, showCheckIn, onChec
               : "bg-transparent text-[var(--ink)] border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)]"
           }`}
         >
-          <span className="text-sm font-medium">Quick check-in</span>
+          <span className="text-base font-medium">Quick check-in</span>
           <span
-            className={`block text-xs mt-0.5 ${
+            className={`block text-sm mt-0.5 ${
               showCheckIn ? "opacity-50" : "text-[var(--ink-light)]"
             }`}
           >

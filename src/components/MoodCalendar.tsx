@@ -55,22 +55,22 @@ export function MoodCalendar() {
   return (
     <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-[var(--ink)]">
+        <h2 className="text-base font-medium text-[var(--ink)]">
           Mood Calendar
         </h2>
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
-            className="text-xs text-[var(--ink-light)] hover:text-[var(--ink)] px-1"
+            className="text-sm text-[var(--ink-light)] hover:text-[var(--ink)] px-1"
           >
             &larr;
           </button>
-          <span className="text-xs text-[var(--ink-light)] min-w-[120px] text-center">
+          <span className="text-sm text-[var(--ink-light)] min-w-[120px] text-center">
             {monthName}
           </span>
           <button
             onClick={nextMonth}
-            className="text-xs text-[var(--ink-light)] hover:text-[var(--ink)] px-1"
+            className="text-sm text-[var(--ink-light)] hover:text-[var(--ink)] px-1"
           >
             &rarr;
           </button>
@@ -82,7 +82,7 @@ export function MoodCalendar() {
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
           <div
             key={i}
-            className="text-center text-[10px] text-[var(--ink-light)] font-medium py-1"
+            className="text-center text-xs text-[var(--ink-light)] font-medium py-1"
           >
             {d}
           </div>
@@ -106,7 +106,7 @@ export function MoodCalendar() {
             <button
               key={day}
               onClick={() => setSelectedDay(isSelected ? null : day)}
-              className={`aspect-square flex items-center justify-center text-[10px] rounded-sm transition-all ${
+              className={`aspect-square flex items-center justify-center text-xs rounded-sm transition-all ${
                 isSelected ? "ring-1 ring-[var(--ink)]" : ""
               } ${dayData ? "cursor-pointer hover:ring-1 hover:ring-[var(--ink-light)]" : "cursor-default"}`}
               style={{
@@ -128,13 +128,13 @@ export function MoodCalendar() {
       {/* Day detail */}
       {selectedDayData && selectedDay && (
         <div className="border-t border-[rgba(26,26,26,0.08)] pt-3 flex flex-col gap-1">
-          <p className="text-xs font-medium text-[var(--ink)]">
+          <p className="text-sm font-medium text-[var(--ink)]">
             {new Date(year, month - 1, selectedDay).toLocaleDateString(
               "en-US",
               { weekday: "long", month: "short", day: "numeric" },
             )}
           </p>
-          <div className="flex items-center gap-2 text-xs text-[var(--ink-light)]">
+          <div className="flex items-center gap-2 text-sm text-[var(--ink-light)]">
             <span className="capitalize">{selectedDayData.dominantTone}</span>
             <span>&middot;</span>
             <span>Alignment: {selectedDayData.avgAlignment}/10</span>

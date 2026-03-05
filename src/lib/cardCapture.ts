@@ -5,8 +5,6 @@ export async function captureCard(
   const canvas = await html2canvas(element, {
     scale: 2,
     backgroundColor: "#faf9f6",
-    width: 1080 / 2,
-    height: 1080 / 2,
   });
   return new Promise((resolve) => {
     canvas.toBlob((blob) => resolve(blob), "image/png");

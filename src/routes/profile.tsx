@@ -36,6 +36,7 @@ function ProfilePage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [editingManifesto, setEditingManifesto] = useState(false);
 
   useEffect(() => {
     if (user?.dreamProfile) {
@@ -44,10 +45,23 @@ function ProfilePage() {
     }
   }, [user?.dreamProfile]);
 
+  const generateManifesto = () => {
+    const parts = CATEGORIES
+      .map(({ key, label }) => categories[key] ? `${label}: ${categories[key]}` : "")
+      .filter(Boolean);
+    return parts.join(". ") + ".";
+  };
+
+  const handleRegenerateManifesto = () => {
+    setManifesto(generateManifesto());
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateProfile({ manifesto, categories });
+      const finalManifesto = manifesto.trim() || generateManifesto();
+      await updateProfile({ manifesto: finalManifesto, categories });
+      setManifesto(finalManifesto);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } finally {
@@ -62,15 +76,10 @@ function ProfilePage() {
           <h1 className="display-title font-normal text-[var(--ink)]">Dream Profile</h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+            className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Journal
           </button>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Your manifesto</label>
-          <ManifestoEditor value={manifesto} onChange={setManifesto} />
         </div>
 
         <div className="flex flex-col gap-3">
@@ -84,6 +93,36 @@ function ProfilePage() {
               onChange={(val) => setCategories((c) => ({ ...c, [key]: val }))}
             />
           ))}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Your manifesto</label>
+            <div className="flex gap-2">
+              <button
+                onClick={handleRegenerateManifesto}
+                className="text-sm text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors"
+              >
+                Regenerate from dimensions
+              </button>
+              <button
+                onClick={() => setEditingManifesto(!editingManifesto)}
+                className="text-sm text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors"
+              >
+                {editingManifesto ? "Done" : "Edit"}
+              </button>
+            </div>
+          </div>
+          {editingManifesto ? (
+            <ManifestoEditor value={manifesto} onChange={setManifesto} />
+          ) : (
+            <div
+              className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-4 text-base text-[var(--ink)] leading-relaxed whitespace-pre-wrap cursor-pointer"
+              onClick={() => setEditingManifesto(true)}
+            >
+              {manifesto || <span className="text-[var(--ink-light)] italic">Fill in your dimensions above to generate your manifesto</span>}
+            </div>
+          )}
         </div>
 
         {/* Streak preferences */}

@@ -8,8 +8,8 @@ export function GraceDaySelector() {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-xs font-medium text-[var(--ink)]">Grace Days Per Week</label>
-      <p className="text-xs text-[var(--ink-light)]">
+      <label className="text-sm font-medium text-[var(--ink)]">Grace Days Per Week</label>
+      <p className="text-sm text-[var(--ink-light)]">
         Allow missed days without breaking your streak
       </p>
       <div className="flex gap-0 border border-[rgba(26,26,26,0.12)]">
@@ -17,7 +17,7 @@ export function GraceDaySelector() {
           <button
             key={n}
             onClick={() => updatePrefs({ graceDaysPerWeek: n })}
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 text-base font-medium transition-colors ${
               current === n
                 ? "bg-[var(--ink)] text-[var(--paper)]"
                 : "bg-transparent text-[var(--ink-light)] hover:text-[var(--ink)]"

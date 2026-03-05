@@ -4,11 +4,17 @@ interface AlignmentDialProps {
 }
 
 function scoreColor(score: number): string {
-  if (score <= 2) return "#ef4444"; // red-500
-  if (score === 3) return "#f97316"; // orange-500
-  if (score <= 5) return "#eab308"; // yellow-500
-  if (score <= 7) return "#22c55e"; // green-500
-  return "#10b981"; // emerald-500
+  if (score <= 3) return "#d4a574"; // warm tan
+  if (score <= 5) return "#c49a6c"; // warm amber
+  if (score <= 7) return "#7ab648"; // fresh green
+  return "#10b981"; // emerald
+}
+
+function scoreLabel(score: number): string {
+  if (score <= 3) return "Planting seeds";
+  if (score <= 5) return "Building momentum";
+  if (score <= 7) return "In the flow";
+  return "Deeply aligned";
 }
 
 const RADIUS = 36;
@@ -52,25 +58,25 @@ export function AlignmentDial({ score, rationale }: AlignmentDialProps) {
           y={38}
           textAnchor="middle"
           dominantBaseline="central"
-          className="text-lg font-bold"
+          className="text-xl font-bold"
           fill="currentColor"
-          fontSize={18}
+          fontSize={24}
         >
           {score}
         </text>
-        {/* "out of 10" label */}
+        {/* Label */}
         <text
           x={40}
           y={52}
           textAnchor="middle"
           dominantBaseline="central"
           fill="var(--ink-light)"
-          fontSize={7}
+          fontSize={10}
         >
-          out of 10
+          {scoreLabel(score)}
         </text>
       </svg>
-      <p className="text-sm text-[var(--ink-light)] text-center max-w-xs">{rationale}</p>
+      <p className="text-base text-[var(--ink-light)] text-center max-w-xs">{rationale}</p>
     </div>
   );
 }

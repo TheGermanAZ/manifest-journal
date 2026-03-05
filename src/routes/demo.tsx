@@ -125,10 +125,10 @@ function StaticMoodCalendar() {
   return (
     <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-[var(--ink)]">
+        <h2 className="text-base font-medium text-[var(--ink)]">
           Mood Calendar
         </h2>
-        <span className="text-xs text-[var(--ink-light)]">February 2026</span>
+        <span className="text-sm text-[var(--ink-light)]">February 2026</span>
       </div>
 
       {/* Day of week headers */}
@@ -136,7 +136,7 @@ function StaticMoodCalendar() {
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
           <div
             key={i}
-            className="text-center text-[10px] text-[var(--ink-light)] font-medium py-1"
+            className="text-center text-xs text-[var(--ink-light)] font-medium py-1"
           >
             {d}
           </div>
@@ -158,7 +158,7 @@ function StaticMoodCalendar() {
           return (
             <div
               key={day}
-              className="aspect-square flex items-center justify-center text-[10px] rounded-sm"
+              className="aspect-square flex items-center justify-center text-xs rounded-sm"
               style={{
                 backgroundColor: dayData ? bgColor : "transparent",
                 opacity: dayData ? 1 : 0.3,
@@ -183,7 +183,7 @@ function StaticMoodCalendar() {
               className="inline-block w-2.5 h-2.5 rounded-sm"
               style={{ backgroundColor: color }}
             />
-            <span className="text-[10px] text-[var(--ink-light)] capitalize">
+            <span className="text-xs text-[var(--ink-light)] capitalize">
               {tone}
             </span>
           </div>
@@ -202,23 +202,23 @@ function DemoPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="display-title font-normal text-lg text-[var(--ink)]">
+            <h1 className="display-title font-normal text-xl text-[var(--ink)]">
               Momentum
             </h1>
-            <span className="px-2 py-0.5 text-[10px] uppercase tracking-widest font-semibold text-[var(--vermillion)] border border-[var(--vermillion)] rounded-sm">
+            <span className="px-2 py-0.5 text-xs uppercase tracking-widest font-semibold text-[var(--vermillion)] border border-[var(--vermillion)] rounded-sm">
               Demo
             </span>
           </div>
           <Link
             to="/login"
-            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+            className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Log in
           </Link>
         </div>
 
         {/* Disclaimer */}
-        <div className="bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
+        <div className="bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 leading-relaxed">
           This is sample data from a fictional journal. It shows what your
           dashboard could look like after consistent use.{" "}
           <Link
@@ -233,8 +233,8 @@ function DemoPage() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">30</span>
-            <span className="text-xs text-[var(--ink-light)]">day streak</span>
+            <span className="text-3xl font-bold text-[var(--ink)]">30</span>
+            <span className="text-sm text-[var(--ink-light)]">day streak</span>
             {/* Grace day dots: 1 of 2 used */}
             <div
               className="flex gap-1 mt-1"
@@ -245,36 +245,36 @@ function DemoPage() {
             </div>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">87</span>
-            <span className="text-xs text-[var(--ink-light)]">entries</span>
+            <span className="text-3xl font-bold text-[var(--ink)]">87</span>
+            <span className="text-sm text-[var(--ink-light)]">entries</span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)] capitalize">
+            <span className="text-3xl font-bold text-[var(--ink)] capitalize">
               Expansive
             </span>
-            <span className="text-xs text-[var(--ink-light)]">top tone</span>
+            <span className="text-sm text-[var(--ink-light)]">top tone</span>
           </div>
         </div>
 
         {/* Writing stats row */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               42,350
             </span>
-            <span className="text-xs text-[var(--ink-light)]">total words</span>
+            <span className="text-sm text-[var(--ink-light)]">total words</span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">487</span>
-            <span className="text-xs text-[var(--ink-light)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">487</span>
+            <span className="text-sm text-[var(--ink-light)]">
               avg words/entry
             </span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               18h 32m
             </span>
-            <span className="text-xs text-[var(--ink-light)]">
+            <span className="text-sm text-[var(--ink-light)]">
               writing time
             </span>
           </div>
@@ -282,7 +282,7 @@ function DemoPage() {
 
         {/* Alignment trend */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">
+          <h2 className="text-base font-medium text-[var(--ink)]">
             Alignment Trend
           </h2>
           <AlignmentChart data={mockAlignmentTrend} />
@@ -290,7 +290,7 @@ function DemoPage() {
 
         {/* Emotional arc */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">
+          <h2 className="text-base font-medium text-[var(--ink)]">
             Emotional Arc
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -299,7 +299,7 @@ function DemoPage() {
               .map(([tone, count]) => (
                 <span
                   key={tone}
-                  className="px-3 py-1.5 bg-stone-100 text-stone-600 text-xs font-medium"
+                  className="px-3 py-1.5 bg-stone-100 text-stone-600 text-sm font-medium"
                 >
                   {tone} x {count}
                 </span>
@@ -312,7 +312,7 @@ function DemoPage() {
 
         {/* Dimension balance */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-4">
-          <h2 className="text-sm font-medium text-[var(--ink)]">
+          <h2 className="text-base font-medium text-[var(--ink)]">
             Dimension Balance
           </h2>
 
@@ -325,7 +325,7 @@ function DemoPage() {
             {mockDimensions.map((dim) => (
               <div
                 key={dim.name}
-                className="flex items-center justify-between text-xs"
+                className="flex items-center justify-between text-sm"
               >
                 <span className="capitalize text-[var(--ink)]">{dim.name}</span>
                 <span className="font-medium text-[var(--ink)]">
@@ -338,7 +338,7 @@ function DemoPage() {
           {/* Neglect callout */}
           {mockNeglected.length > 0 && (
             <div className="border-t border-[rgba(26,26,26,0.08)] pt-3">
-              <p className="text-xs text-[var(--vermillion)]">
+              <p className="text-sm text-[var(--vermillion)]">
                 Most neglected: {mockNeglected.join(", ")}
               </p>
             </div>
@@ -347,7 +347,7 @@ function DemoPage() {
 
         {/* Latest weekly summary */}
         <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-medium text-[var(--ink)]">
+          <h2 className="text-base font-medium text-[var(--ink)]">
             Latest Weekly Reflection
           </h2>
           <WeeklySummaryCard summary={mockWeeklySummary} />
@@ -355,14 +355,14 @@ function DemoPage() {
 
         {/* Milestones */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">Milestones</h2>
+          <h2 className="text-base font-medium text-[var(--ink)]">Milestones</h2>
           <div className="flex flex-wrap gap-2">
             {mockMilestones.map((type) => {
               const config = milestoneConfig[type];
               return (
                 <span
                   key={type}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 text-sm font-medium rounded-full"
                 >
                   {config?.icon ?? "\u2726"} {config?.title ?? type}
                 </span>
@@ -374,14 +374,14 @@ function DemoPage() {
         {/* CTA */}
         <Link
           to="/login"
-          className="block w-full text-center py-3 bg-[var(--vermillion)] text-white text-sm font-medium tracking-wide hover:opacity-90 transition-opacity"
+          className="block w-full text-center py-3 bg-[var(--vermillion)] text-white text-base font-medium tracking-wide hover:opacity-90 transition-opacity"
         >
           Start Journaling
         </Link>
 
         {/* Profile link placeholder */}
-        <p className="text-sm text-[var(--ink-light)] text-center">
-          Define your dream life, journal daily, and let AI coach you toward it.
+        <p className="text-base text-[var(--ink-light)] text-center">
+          Define your dream life, journal daily, and let your coach guide you toward it.
         </p>
       </div>
     </div>

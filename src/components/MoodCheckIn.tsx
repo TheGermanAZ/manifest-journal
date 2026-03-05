@@ -37,7 +37,7 @@ export function MoodCheckIn() {
 
   return (
     <div className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-5 flex flex-col gap-4">
-      <p className="text-sm text-[var(--ink-light)]">How are you feeling right now?</p>
+      <p className="text-base text-[var(--ink-light)]">How are you feeling right now?</p>
 
       <div className="grid grid-cols-4 gap-2">
         {moods.map((mood) => (
@@ -50,8 +50,8 @@ export function MoodCheckIn() {
                 : "border-[rgba(26,26,26,0.08)] hover:border-[var(--ink-light)]"
             }`}
           >
-            <span className="text-xl">{mood.emoji}</span>
-            <span className="text-[10px] text-[var(--ink-light)]">{mood.label}</span>
+            <span className="text-2xl">{mood.emoji}</span>
+            <span className="text-xs text-[var(--ink-light)]">{mood.label}</span>
           </button>
         ))}
       </div>
@@ -61,14 +61,14 @@ export function MoodCheckIn() {
         onChange={(e) => setNote(e.target.value)}
         placeholder="Optional note..."
         rows={3}
-        className="w-full resize-none text-[var(--ink)] text-sm leading-relaxed bg-transparent border border-[rgba(26,26,26,0.08)] p-3 focus:outline-none focus:border-[var(--ink-light)] placeholder:text-[var(--ink-light)] placeholder:opacity-50"
+        className="w-full resize-none text-[var(--ink)] text-base leading-relaxed bg-transparent border border-[rgba(26,26,26,0.08)] p-3 focus:outline-none focus:border-[var(--ink-light)] placeholder:text-[var(--ink-light)] placeholder:opacity-50"
       />
 
       <div className="flex justify-end">
         <button
           onClick={handleSubmit}
           disabled={!selected || isSubmitting}
-          className="ink-cta py-2 px-5 text-sm disabled:opacity-40"
+          className="ink-cta py-2 px-5 text-base disabled:opacity-40"
         >
           {isSubmitting ? "Saving..." : "Check in"}
         </button>
