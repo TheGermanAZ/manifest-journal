@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { EntryCard } from "./EntryCard";
+
+vi.mock("convex/react", () => ({
+  useMutation: () => vi.fn(),
+}));
 
 const mockEntry = {
   _id: "entry1" as any,

@@ -9,16 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WeeklyRouteImport } from './routes/weekly'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PathsRouteImport } from './routes/paths'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as HighlightsRouteImport } from './routes/highlights'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResponseEntryIdRouteImport } from './routes/response.$entryId'
 
+const WeeklyRoute = WeeklyRouteImport.update({
+  id: '/weekly',
+  path: '/weekly',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -27,6 +36,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PathsRoute = PathsRouteImport.update({
+  id: '/paths',
+  path: '/paths',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -49,6 +63,16 @@ const HistoryRoute = HistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HighlightsRoute = HighlightsRouteImport.update({
+  id: '/highlights',
+  path: '/highlights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -68,35 +92,47 @@ const ResponseEntryIdRoute = ResponseEntryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
+  '/highlights': typeof HighlightsRoute
   '/history': typeof HistoryRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/paths': typeof PathsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/weekly': typeof WeeklyRoute
   '/response/$entryId': typeof ResponseEntryIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
+  '/highlights': typeof HighlightsRoute
   '/history': typeof HistoryRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/paths': typeof PathsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/weekly': typeof WeeklyRoute
   '/response/$entryId': typeof ResponseEntryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
+  '/highlights': typeof HighlightsRoute
   '/history': typeof HistoryRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/paths': typeof PathsRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/weekly': typeof WeeklyRoute
   '/response/$entryId': typeof ResponseEntryIdRoute
 }
 export interface FileRouteTypes {
@@ -104,51 +140,74 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/demo'
+    | '/highlights'
     | '/history'
     | '/landing'
     | '/login'
     | '/onboarding'
+    | '/paths'
     | '/profile'
     | '/register'
+    | '/weekly'
     | '/response/$entryId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
+    | '/demo'
+    | '/highlights'
     | '/history'
     | '/landing'
     | '/login'
     | '/onboarding'
+    | '/paths'
     | '/profile'
     | '/register'
+    | '/weekly'
     | '/response/$entryId'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/demo'
+    | '/highlights'
     | '/history'
     | '/landing'
     | '/login'
     | '/onboarding'
+    | '/paths'
     | '/profile'
     | '/register'
+    | '/weekly'
     | '/response/$entryId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  DemoRoute: typeof DemoRoute
+  HighlightsRoute: typeof HighlightsRoute
   HistoryRoute: typeof HistoryRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  PathsRoute: typeof PathsRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  WeeklyRoute: typeof WeeklyRoute
   ResponseEntryIdRoute: typeof ResponseEntryIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/weekly': {
+      id: '/weekly'
+      path: '/weekly'
+      fullPath: '/weekly'
+      preLoaderRoute: typeof WeeklyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -161,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/paths': {
+      id: '/paths'
+      path: '/paths'
+      fullPath: '/paths'
+      preLoaderRoute: typeof PathsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -191,6 +257,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/highlights': {
+      id: '/highlights'
+      path: '/highlights'
+      fullPath: '/highlights'
+      preLoaderRoute: typeof HighlightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -218,12 +298,16 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  DemoRoute: DemoRoute,
+  HighlightsRoute: HighlightsRoute,
   HistoryRoute: HistoryRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  PathsRoute: PathsRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  WeeklyRoute: WeeklyRoute,
   ResponseEntryIdRoute: ResponseEntryIdRoute,
 }
 export const routeTree = rootRouteImport
