@@ -53,7 +53,7 @@ function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "discord",
-        callbackURL: window.location.origin + "/",
+        callbackURL: window.location.origin + "/?authCallback=1",
         errorCallbackURL: window.location.origin + "/login",
       });
     } catch (err) {
