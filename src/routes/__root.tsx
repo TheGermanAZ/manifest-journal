@@ -8,22 +8,22 @@ import '../styles.css'
 export const Route = createRootRoute({
   component: Root,
   errorComponent: ({ error }) => (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+    <div className="flex min-h-screen items-center justify-center px-4">
       <div className="text-center max-w-sm">
-        <h1 className="text-2xl font-bold text-stone-900">Something went wrong</h1>
-        <p className="mt-2 text-sm text-stone-500">{error.message}</p>
-        <a href="/" className="mt-4 inline-block text-sm font-medium text-stone-900 hover:underline">
+        <h1 className="text-2xl font-normal display-title text-[var(--ink)]">Something went wrong</h1>
+        <p className="mt-2 text-sm text-[var(--ink-light)]">{error.message}</p>
+        <a href="/" className="mt-4 inline-block text-sm font-medium text-[var(--ink)] hover:text-[var(--vermillion)] transition-colors">
           Reload
         </a>
       </div>
     </div>
   ),
   notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-stone-900">Page not found</h1>
-        <p className="mt-2 text-sm text-stone-500">The page you're looking for doesn't exist.</p>
-        <Link to="/" className="mt-4 inline-block text-sm font-medium text-stone-900 hover:underline">
+        <h1 className="text-2xl font-normal display-title text-[var(--ink)]">Page not found</h1>
+        <p className="mt-2 text-sm text-[var(--ink-light)]">The page you're looking for doesn't exist.</p>
+        <Link to="/" className="mt-4 inline-block text-sm font-medium text-[var(--ink)] hover:text-[var(--vermillion)] transition-colors">
           Go home
         </Link>
       </div>

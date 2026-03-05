@@ -28,7 +28,7 @@ export function AlignmentDial({ score, rationale }: AlignmentDialProps) {
           cy={40}
           r={RADIUS}
           fill="none"
-          stroke="#e7e5e4"
+          stroke="rgba(26,26,26,0.1)"
           strokeWidth={STROKE_WIDTH}
         />
         {/* Progress circle */}
@@ -64,13 +64,13 @@ export function AlignmentDial({ score, rationale }: AlignmentDialProps) {
           y={52}
           textAnchor="middle"
           dominantBaseline="central"
-          fill="#a8a29e"
+          fill="var(--ink-light)"
           fontSize={7}
         >
           out of 10
         </text>
       </svg>
-      <p className="text-sm text-stone-500 text-center max-w-xs">{rationale}</p>
+      <p className="text-sm text-[var(--ink-light)] text-center max-w-xs">{rationale}</p>
     </div>
   );
 }

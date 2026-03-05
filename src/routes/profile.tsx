@@ -53,25 +53,25 @@ function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-stone-900">Dream Profile</h1>
+          <h1 className="display-title font-normal text-[var(--ink)]">Dream Profile</h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Journal
           </button>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-stone-700">Your manifesto</label>
+          <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Your manifesto</label>
           <ManifestoEditor value={manifesto} onChange={setManifesto} />
         </div>
 
         <div className="flex flex-col gap-3">
-          <label className="text-sm font-medium text-stone-700">Five dimensions</label>
+          <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Five dimensions</label>
           {CATEGORIES.map(({ key, label }) => (
             <CategoryCard
               key={key}
@@ -86,7 +86,7 @@ function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-stone-900 text-white text-sm font-medium py-3 rounded-xl disabled:opacity-40 hover:bg-stone-800"
+          className="ink-cta w-full py-3 text-center disabled:opacity-40"
         >
           {saved ? "Saved" : isSaving ? "Saving..." : "Save profile"}
         </button>

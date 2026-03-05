@@ -13,9 +13,9 @@ const typeStyles: Record<InsightCardProps["type"], string> = {
 
 export function InsightCard({ type, title, content, badge }: InsightCardProps) {
   return (
-    <div className={`rounded-2xl border p-5 ${typeStyles[type]}`}>
+    <div className={`border p-5 ${typeStyles[type]}`}>
       <div className="flex items-center gap-2 mb-2">
-        <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-light)]">
           {title}
         </p>
         {badge && (
@@ -24,7 +24,7 @@ export function InsightCard({ type, title, content, badge }: InsightCardProps) {
           </span>
         )}
       </div>
-      <p className="text-sm text-stone-700 leading-relaxed">{content}</p>
+      <p className="text-sm text-[var(--ink)] leading-relaxed">{content}</p>
     </div>
   );
 }

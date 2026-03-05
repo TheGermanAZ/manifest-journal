@@ -20,8 +20,8 @@ function ResponsePage() {
 
   if (!entry) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="animate-pulse text-stone-400 text-sm">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--ink-light)] text-sm">
           Loading your analysis...
         </div>
       </div>
@@ -32,8 +32,8 @@ function ResponsePage() {
 
   if (!analysis) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="animate-pulse text-stone-400 text-sm">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--ink-light)] text-sm">
           Analyzing your entry...
         </div>
       </div>
@@ -41,13 +41,13 @@ function ResponsePage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div>
-          <p className="text-xs text-stone-400 uppercase tracking-wide">
+          <p className="text-xs text-[var(--ink-light)] uppercase tracking-wide">
             Your coach says
           </p>
-          <h1 className="text-lg font-semibold text-stone-900">
+          <h1 className="display-title text-lg font-normal text-[var(--ink)]">
             Today's reflection
           </h1>
         </div>
@@ -65,8 +65,8 @@ function ResponsePage() {
           badge={analysis.emotionalTone}
         />
 
-        <div className="bg-white border border-stone-200 rounded-2xl p-6">
-          <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-4 text-center">
+        <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-6">
+          <p className="text-xs font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-4 text-center">
             Alignment Pulse
           </p>
           <AlignmentDial
@@ -78,13 +78,13 @@ function ResponsePage() {
         <div className="flex gap-3">
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex-1 border border-stone-200 bg-white text-stone-700 text-sm font-medium py-3 rounded-xl hover:border-stone-400"
+            className="flex-1 border border-[rgba(26,26,26,0.15)] bg-transparent text-[var(--ink)] text-sm font-medium py-3 hover:border-[var(--ink)] transition-colors"
           >
             Done for today
           </button>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex-1 bg-stone-900 text-white text-sm font-medium py-3 rounded-xl hover:bg-stone-800"
+            className="ink-cta flex-1 py-3 text-center"
           >
             Keep writing
           </button>
