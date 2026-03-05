@@ -53,19 +53,19 @@ export function EntryCard({ entry, onClick }: EntryCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left bg-white border border-stone-200 rounded-2xl p-4 flex gap-4 items-start hover:border-stone-300 hover:shadow-sm transition-all"
+      className="w-full text-left bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex gap-4 items-start hover:border-[var(--ink)] transition-all"
     >
       {/* Date column */}
       <div className="flex flex-col items-center min-w-[40px]">
-        <span className="text-xs uppercase text-stone-400 font-medium">
+        <span className="text-xs uppercase text-[var(--ink-light)] font-medium">
           {month}
         </span>
-        <span className="text-lg font-semibold text-stone-900">{day}</span>
+        <span className="text-lg font-semibold text-[var(--ink)]">{day}</span>
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0 flex flex-col gap-2">
-        <p className="text-sm text-stone-700 leading-relaxed">{preview}</p>
+        <p className="text-sm text-[var(--ink)] leading-relaxed">{preview}</p>
 
         {analysis && (
           <div className="flex items-center gap-2 flex-wrap">

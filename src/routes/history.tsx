@@ -17,16 +17,16 @@ function HistoryPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-stone-900">
+          <h1 className="display-title font-normal text-lg text-[var(--ink)]">
             Entry History
           </h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Journal
           </button>
@@ -35,13 +35,13 @@ function HistoryPage() {
         {/* Entry list */}
         {entries === undefined ? (
           <div className="flex items-center justify-center py-16">
-            <div className="animate-pulse text-stone-400 text-sm">
+            <div className="animate-pulse text-[var(--ink-light)] text-sm">
               Loading entries...
             </div>
           </div>
         ) : entries.length === 0 ? (
           <div className="flex items-center justify-center py-16">
-            <p className="text-stone-400 text-sm">
+            <p className="text-[var(--ink-light)] text-sm">
               No entries yet. Write your first one.
             </p>
           </div>

@@ -18,8 +18,8 @@ function DashboardPage() {
 
   if (stats === undefined) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="animate-pulse text-stone-400 text-sm">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--ink-light)] text-sm">
           Loading dashboard...
         </div>
       </div>
@@ -33,14 +33,14 @@ function DashboardPage() {
   )[0];
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-stone-900">Momentum</h1>
+          <h1 className="display-title font-normal text-lg text-[var(--ink)]">Momentum</h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Journal
           </button>
@@ -48,39 +48,39 @@ function DashboardPage() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-stone-900">
+          <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold text-[var(--ink)]">
               {stats.streak}
             </span>
-            <span className="text-xs text-stone-400">day streak</span>
+            <span className="text-xs text-[var(--ink-light)]">day streak</span>
           </div>
-          <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-stone-900">
+          <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold text-[var(--ink)]">
               {stats.totalEntries}
             </span>
-            <span className="text-xs text-stone-400">entries</span>
+            <span className="text-xs text-[var(--ink-light)]">entries</span>
           </div>
-          <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-stone-900 capitalize">
+          <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
+            <span className="text-2xl font-bold text-[var(--ink)] capitalize">
               {topTone ? topTone[0] : "--"}
             </span>
-            <span className="text-xs text-stone-400">top tone</span>
+            <span className="text-xs text-[var(--ink-light)]">top tone</span>
           </div>
         </div>
 
         {/* Alignment trend */}
-        <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-stone-700">
+        <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-[var(--ink)]">
             Alignment Trend
           </h2>
           <AlignmentChart data={stats.alignmentTrend} />
         </div>
 
         {/* Emotional arc */}
-        <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-stone-700">Emotional Arc</h2>
+        <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-[var(--ink)]">Emotional Arc</h2>
           {Object.keys(stats.toneCounts).length === 0 ? (
-            <p className="text-sm text-stone-400 text-center py-4">
+            <p className="text-sm text-[var(--ink-light)] text-center py-4">
               No emotional data yet
             </p>
           ) : (
@@ -90,7 +90,7 @@ function DashboardPage() {
                 .map(([tone, count]) => (
                   <span
                     key={tone}
-                    className="px-3 py-1.5 rounded-full bg-stone-100 text-stone-600 text-xs font-medium"
+                    className="px-3 py-1.5 bg-stone-100 text-stone-600 text-xs font-medium"
                   >
                     {tone} x {count}
                   </span>
@@ -102,7 +102,7 @@ function DashboardPage() {
         {/* Profile link */}
         <button
           onClick={() => navigate({ to: "/profile" })}
-          className="text-sm text-stone-500 underline underline-offset-2 text-center hover:text-stone-700"
+          className="text-sm text-[var(--ink-light)] underline underline-offset-2 text-center hover:text-[var(--vermillion)] transition-colors"
         >
           View &amp; edit dream profile
         </button>

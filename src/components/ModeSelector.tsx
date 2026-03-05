@@ -24,16 +24,16 @@ export function ModeSelector({ selected, onSelect }: ModeSelectorProps) {
           <button
             key={m.value}
             onClick={() => onSelect(m.value)}
-            className={`flex-1 rounded-xl border px-3 py-2.5 text-left transition ${
+            className={`flex-1 border px-3 py-2.5 text-left transition-colors ${
               isSelected
-                ? "bg-stone-900 text-white border-stone-900"
-                : "bg-white text-stone-700 border-stone-200 hover:border-stone-400"
+                ? "bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]"
+                : "bg-transparent text-[var(--ink)] border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)]"
             }`}
           >
             <span className="block text-sm font-medium">{m.label}</span>
             <span
               className={`block text-xs mt-0.5 ${
-                isSelected ? "text-stone-300" : "text-stone-400"
+                isSelected ? "opacity-50" : "text-[var(--ink-light)]"
               }`}
             >
               {m.description}

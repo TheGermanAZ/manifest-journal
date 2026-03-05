@@ -17,8 +17,8 @@ function IndexPage() {
 
   if (isPending) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
-        <div className="animate-pulse text-stone-400 text-sm">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--ink-light)] text-sm">Loading...</div>
       </div>
     );
   }
@@ -201,28 +201,28 @@ function HomePage() {
   const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-stone-400 uppercase tracking-wide">
+            <p className="text-xs text-[var(--ink-light)] uppercase tracking-[0.08em]">
               {today}
             </p>
-            <h1 className="text-lg font-semibold text-stone-900">
+            <h1 className="display-title text-xl font-normal text-[var(--ink)]">
               Daily Journal
             </h1>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => navigate({ to: "/history" })}
-              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               History
             </button>
             <button
               onClick={() => navigate({ to: "/dashboard" })}
-              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Dashboard
             </button>
@@ -231,7 +231,7 @@ function HomePage() {
                 await authClient.signOut();
                 navigate({ to: "/login" });
               }}
-              className="text-xs text-stone-500 px-3 py-1.5 rounded-lg border border-stone-200 bg-white hover:border-stone-400"
+              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Sign out
             </button>
@@ -250,11 +250,11 @@ function HomePage() {
             onFinish={handleConvoFinish}
           />
         ) : (
-          <div className="bg-white border border-stone-200 rounded-2xl p-4 flex flex-col gap-4">
+          <div className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-5 flex flex-col gap-4">
             {mode === "guided" && (
-              <div className="bg-stone-50 rounded-xl px-4 py-3 text-sm text-stone-600 italic leading-relaxed border border-stone-100">
+              <div className="border-l-2 border-[var(--vermillion)] pl-4 py-2 text-sm text-[var(--ink-light)] italic leading-relaxed">
                 {isLoadingPrompt ? (
-                  <span className="animate-pulse text-stone-300">
+                  <span className="animate-pulse text-[var(--ink-light)] opacity-50">
                     Generating your prompt...
                   </span>
                 ) : (
@@ -268,14 +268,14 @@ function HomePage() {
               onChange={(e) => setContent(e.target.value)}
               placeholder="What's on your mind today?"
               rows={12}
-              className="w-full resize-none text-stone-800 text-sm leading-relaxed focus:outline-none"
+              className="w-full resize-none text-[var(--ink)] text-sm leading-relaxed bg-transparent focus:outline-none placeholder:text-[var(--ink-light)] placeholder:opacity-50"
             />
             <div className="flex justify-between items-center">
-              <span className="text-xs text-stone-300">{wordCount} words</span>
+              <span className="text-xs text-[var(--ink-light)] opacity-50">{wordCount} words</span>
               <button
                 onClick={handleSubmit}
                 disabled={!content.trim() || isSubmitting}
-                className="bg-stone-900 text-white text-sm font-medium px-5 py-2 rounded-lg disabled:opacity-40 hover:bg-stone-800"
+                className="ink-cta py-2 px-5 text-sm disabled:opacity-40"
               >
                 {isSubmitting ? "Analyzing..." : "Submit"}
               </button>
