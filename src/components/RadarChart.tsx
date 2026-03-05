@@ -116,7 +116,7 @@ export function RadarChart({ data, size = 200 }: RadarChartProps) {
           y={lp.y}
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-[var(--ink-light)] text-[10px] capitalize"
+          className="fill-[var(--ink-light)] text-xs capitalize"
         >
           {lp.name}
         </text>

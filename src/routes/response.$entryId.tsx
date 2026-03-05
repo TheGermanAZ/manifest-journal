@@ -20,13 +20,21 @@ export const Route = createFileRoute("/response/$entryId")({
 function ResponsePage() {
   const { entryId } = Route.useParams();
   const entry = useQuery(api.entries.getEntry, { entryId: entryId as any });
+  const turns = useQuery(
+    api.conversations.getTurns,
+    entry?.mode === "conversational" ? { entryId: entryId as any } : "skip",
+  );
   const navigate = useNavigate();
   const [showShare, setShowShare] = useState(false);
+
+  const continueWith = (prompt: string) => {
+    navigate({ to: "/", search: { prompt } });
+  };
 
   if (!entry) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--ink-light)] text-sm">
+        <div className="animate-pulse text-[var(--ink-light)] text-base">
           Loading your analysis...
         </div>
       </div>
@@ -38,7 +46,7 @@ function ResponsePage() {
   if (!analysis) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--ink-light)] text-sm">
+        <div className="animate-pulse text-[var(--ink-light)] text-base">
           Analyzing your entry...
         </div>
       </div>
@@ -50,17 +58,17 @@ function ResponsePage() {
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-[var(--ink-light)] uppercase tracking-wide">
+            <p className="text-sm text-[var(--ink-light)] uppercase tracking-wide">
               Your coach says
             </p>
-            <h1 className="display-title text-lg font-normal text-[var(--ink)]">
+            <h1 className="display-title text-xl font-normal text-[var(--ink)]">
               Today's reflection
             </h1>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowShare(true)}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Share
             </button>
@@ -73,17 +81,42 @@ function ResponsePage() {
 
         {entry.content && (
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-5">
-            <p className="text-xs font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-3">
+            <p className="text-sm font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-3">
               Your Entry
             </p>
-            <p className="text-sm text-[var(--ink)] leading-relaxed whitespace-pre-wrap">
+            <p className="text-base text-[var(--ink)] leading-relaxed whitespace-pre-wrap">
               {entry.content}
             </p>
             {entry.wordCount != null && (
-              <p className="text-xs text-[var(--ink-light)] mt-3">
+              <p className="text-sm text-[var(--ink-light)] mt-3">
                 {entry.wordCount} words
               </p>
             )}
+          </div>
+        )}
+
+        {turns && turns.length > 0 && (
+          <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-5">
+            <p className="text-sm font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-4">
+              Conversation
+            </p>
+            <div className="flex flex-col gap-3 max-h-96 overflow-y-auto">
+              {turns.map((turn, i) => (
+                <div
+                  key={i}
+                  className={`text-base leading-relaxed whitespace-pre-wrap ${
+                    turn.role === "user"
+                      ? "text-[var(--ink)] pl-0"
+                      : "text-[var(--ink-light)] pl-4 border-l-2 border-[rgba(26,26,26,0.08)]"
+                  }`}
+                >
+                  <span className="text-sm uppercase tracking-wide font-medium block mb-1">
+                    {turn.role === "user" ? "You" : "Coach"}
+                  </span>
+                  {turn.content}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -91,8 +124,9 @@ function ResponsePage() {
           type="pattern"
           title="Pattern Insight"
           content={analysis.patternInsight}
+          onContinue={continueWith}
         />
-        <InsightCard type="nudge" title="Nudge" content={analysis.nudge} />
+        <InsightCard type="nudge" title="Nudge" content={analysis.nudge} onContinue={continueWith} />
         <InsightCard
           type="tone"
           title="Emotional Tone"
@@ -101,7 +135,7 @@ function ResponsePage() {
         />
 
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-6">
-          <p className="text-xs font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-4 text-center">
+          <p className="text-sm font-semibold text-[var(--ink-light)] uppercase tracking-wide mb-4 text-center">
             Alignment Pulse
           </p>
           <AlignmentDial
@@ -113,14 +147,14 @@ function ResponsePage() {
         {/* Dimension pills */}
         {analysis.dimensions && analysis.dimensions.length > 0 && (
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-            <p className="text-xs font-semibold text-[var(--ink-light)] uppercase tracking-wide">
+            <p className="text-sm font-semibold text-[var(--ink-light)] uppercase tracking-wide">
               Life Dimensions
             </p>
             <div className="flex flex-wrap gap-2">
               {analysis.dimensions.map((dim) => (
                 <span
                   key={dim.name}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 text-xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 text-sm"
                 >
                   <span className="capitalize text-[var(--ink)]">
                     {dim.name}
@@ -140,16 +174,17 @@ function ResponsePage() {
             type="nudge"
             title="Neglected Dimension"
             content={analysis.dimensionPrompt}
+            onContinue={continueWith}
           />
         )}
 
         {analysis.breakthroughScore != null &&
           analysis.breakthroughScore >= 7 && (
             <div className="bg-amber-50 border border-amber-200 p-4 flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-700">
+              <span className="inline-flex items-center rounded-full px-2.5 py-1 text-sm font-medium bg-amber-100 text-amber-700">
                 Breakthrough
               </span>
-              <p className="text-sm text-amber-800">
+              <p className="text-base text-amber-800">
                 This entry represents a significant shift in self-awareness or
                 action.
               </p>
@@ -159,7 +194,7 @@ function ResponsePage() {
         <div className="flex gap-3">
           <button
             onClick={() => navigate({ to: "/" })}
-            className="flex-1 border border-[rgba(26,26,26,0.15)] bg-transparent text-[var(--ink)] text-sm font-medium py-3 hover:border-[var(--ink)] transition-colors"
+            className="flex-1 border border-[rgba(26,26,26,0.15)] bg-transparent text-[var(--ink)] text-base font-medium py-3 hover:border-[var(--ink)] transition-colors"
           >
             Done for today
           </button>

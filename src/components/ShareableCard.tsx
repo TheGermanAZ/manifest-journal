@@ -41,7 +41,7 @@ export function ShareableCard({ variant, data }: ShareableCardProps) {
         className="w-[270px] h-[270px] bg-[var(--paper)] border border-[rgba(26,26,26,0.12)] p-6 flex flex-col items-center justify-center gap-3"
         style={{ fontFamily: "'Cormorant Garamond', serif" }}
       >
-        <p className="text-[10px] uppercase tracking-[0.12em] text-[var(--ink-light)]">
+        <p className="text-xs uppercase tracking-[0.12em] text-[var(--ink)]">
           Manifest Journal
         </p>
 
@@ -50,7 +50,7 @@ export function ShareableCard({ variant, data }: ShareableCardProps) {
             <span className="text-4xl font-bold text-[var(--vermillion)]">
               {data.alignmentScore}/10
             </span>
-            <p className="text-xs text-[var(--ink-light)]">Alignment Score</p>
+            <p className="text-sm text-[var(--ink)]">Alignment Score</p>
           </>
         )}
 
@@ -59,26 +59,26 @@ export function ShareableCard({ variant, data }: ShareableCardProps) {
             <span className="text-4xl font-bold text-[var(--ink)]">
               {data.streak}
             </span>
-            <p className="text-xs text-[var(--ink-light)]">Day Streak</p>
+            <p className="text-sm text-[var(--ink)]">Day Streak</p>
           </>
         )}
 
         {variant === "tone" && (
           <>
-            <span className="text-2xl capitalize text-[var(--ink)]">
+            <span className="text-3xl capitalize text-[var(--ink)]">
               {data.tone}
             </span>
-            <p className="text-xs text-[var(--ink-light)]">Dominant Tone</p>
+            <p className="text-sm text-[var(--ink)]">Dominant Tone</p>
           </>
         )}
 
         {variant === "weekly" && (
           <>
-            <span className="text-sm text-[var(--ink)]">{data.weekRange}</span>
-            <span className="text-2xl font-bold text-[var(--vermillion)]">
+            <span className="text-base text-[var(--ink)]">{data.weekRange}</span>
+            <span className="text-3xl font-bold text-[var(--vermillion)]">
               {data.avgAlignment}/10
             </span>
-            <p className="text-xs text-[var(--ink-light)]">
+            <p className="text-sm text-[var(--ink)]">
               {data.entryCount} entries this week
             </p>
           </>
@@ -91,13 +91,13 @@ export function ShareableCard({ variant, data }: ShareableCardProps) {
       <div className="flex gap-2">
         <button
           onClick={handleDownload}
-          className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)] transition-colors"
+          className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)] transition-colors"
         >
           Download
         </button>
         <button
           onClick={handleCopy}
-          className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)] transition-colors"
+          className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] hover:border-[var(--ink)] transition-colors"
         >
           {copied ? "Copied!" : "Copy"}
         </button>

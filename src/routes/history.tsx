@@ -77,19 +77,19 @@ function HistoryPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="display-title font-normal text-lg text-[var(--ink)]">
+          <h1 className="display-title font-normal text-xl text-[var(--ink)]">
             Entry History
           </h1>
           <div className="flex gap-2">
             <button
               onClick={() => setShowExport(true)}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Export
             </button>
             <button
               onClick={() => navigate({ to: "/" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Journal
             </button>
@@ -103,12 +103,12 @@ function HistoryPage() {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search your entries..."
-            className="w-full px-4 py-2.5 text-sm text-[var(--ink)] bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] placeholder:text-[var(--ink-light)] placeholder:opacity-50 focus:outline-none focus:border-[var(--ink)] transition-colors"
+            className="w-full px-4 py-2.5 text-base text-[var(--ink)] bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] placeholder:text-[var(--ink-light)] placeholder:opacity-50 focus:outline-none focus:border-[var(--ink)] transition-colors"
           />
           {searchQuery && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors"
             >
               Clear
             </button>
@@ -117,19 +117,19 @@ function HistoryPage() {
 
         {/* Search status */}
         {isSearching && (
-          <div className="text-xs text-[var(--ink-light)] animate-pulse">
+          <div className="text-sm text-[var(--ink-light)] animate-pulse">
             Searching...
           </div>
         )}
 
         {isShowingSearch && !isSearching && (
           <div className="flex items-center justify-between">
-            <p className="text-xs text-[var(--ink-light)]">
+            <p className="text-sm text-[var(--ink-light)]">
               {searchResults.length} result{searchResults.length !== 1 ? "s" : ""} for "{searchQuery}"
             </p>
             <button
               onClick={clearSearch}
-              className="text-xs text-[var(--ink-light)] hover:text-[var(--ink)] underline transition-colors"
+              className="text-sm text-[var(--ink-light)] hover:text-[var(--ink)] underline transition-colors"
             >
               Show all entries
             </button>
@@ -139,13 +139,13 @@ function HistoryPage() {
         {/* Entry list */}
         {displayEntries === undefined ? (
           <div className="flex items-center justify-center py-16">
-            <div className="animate-pulse text-[var(--ink-light)] text-sm">
+            <div className="animate-pulse text-[var(--ink-light)] text-base">
               Loading entries...
             </div>
           </div>
         ) : displayEntries.length === 0 ? (
           <div className="flex items-center justify-center py-16">
-            <p className="text-[var(--ink-light)] text-sm">
+            <p className="text-[var(--ink-light)] text-base">
               {isShowingSearch
                 ? "No matching entries found."
                 : "No entries yet. Write your first one."}

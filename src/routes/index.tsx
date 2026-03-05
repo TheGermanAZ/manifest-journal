@@ -12,6 +12,9 @@ import { useAuthSettled } from "../lib/useAuthSettled";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    prompt: (search.prompt as string) || undefined,
+  }),
 });
 
 function IndexPage() {
@@ -20,7 +23,7 @@ function IndexPage() {
   if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--ink-light)] text-sm">Loading...</div>
+        <div className="animate-pulse text-[var(--ink-light)] text-base">Loading...</div>
       </div>
     );
   }
@@ -35,11 +38,13 @@ function IndexPage() {
 type JournalMode = "open" | "guided" | "conversational";
 
 function HomePage() {
-  const [mode, setMode] = useState<JournalMode>("open");
+  const { prompt: continuePrompt } = Route.useSearch();
+  const [mode, setMode] = useState<JournalMode>(continuePrompt ? "conversational" : "open");
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const writingStartedAt = useRef<number | null>(null);
+  const [seededPrompt, setSeededPrompt] = useState(false);
 
   // Guided prompt state
   const [guidedPrompt, setGuidedPrompt] = useState<string | null>(null);
@@ -53,6 +58,14 @@ function HomePage() {
     { role: "user" | "assistant"; content: string }[]
   >([]);
   const [isTurnLoading, setIsTurnLoading] = useState(false);
+
+  // Seed conversation from insight prompt
+  useEffect(() => {
+    if (continuePrompt && !seededPrompt) {
+      setTurns([{ role: "assistant", content: continuePrompt }]);
+      setSeededPrompt(true);
+    }
+  }, [continuePrompt, seededPrompt]);
 
   const user = useQuery(api.users.currentUser);
   const recent = useQuery(api.entries.recentEntries, { limit: 7 });
@@ -82,14 +95,6 @@ function HomePage() {
       )?.prompt ?? null
     : null;
 
-  // Auto-select guided mode when on an active path
-  useEffect(() => {
-    if (activePath && mode !== "guided") {
-      setMode("guided");
-    }
-    // Only trigger when activePath changes, not mode
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activePath]);
 
   // Guided prompt: use path prompt if active, otherwise generate via AI
   useEffect(() => {
@@ -265,35 +270,35 @@ function HomePage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-[var(--ink-light)] uppercase tracking-[0.08em]">
+            <p className="text-sm text-[var(--ink-light)] uppercase tracking-[0.08em]">
               {today}
             </p>
-            <h1 className="display-title text-xl font-normal text-[var(--ink)]">
+            <h1 className="display-title text-2xl font-normal text-[var(--ink)]">
               Daily Journal
             </h1>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => navigate({ to: "/history" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               History
             </button>
             <button
               onClick={() => navigate({ to: "/weekly" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Weekly
             </button>
             <button
               onClick={() => navigate({ to: "/paths" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Paths
             </button>
             <button
               onClick={() => navigate({ to: "/dashboard" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Dashboard
             </button>
@@ -302,7 +307,7 @@ function HomePage() {
                 await authClient.signOut();
                 navigate({ to: "/login" });
               }}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Sign out
             </button>
@@ -319,7 +324,7 @@ function HomePage() {
         />
 
         {/* Active path banner */}
-        {activePath && currentPathPrompt && (
+        {activePath && currentPathPrompt && mode !== "open" && (
           <PathProgressBanner
             pathName={activePath.path.name}
             currentDay={activePath.progress.currentDay}
@@ -346,8 +351,8 @@ function HomePage() {
           />
         ) : (
           <div className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-5 flex flex-col gap-4">
-            {mode === "guided" && (
-              <div className="border-l-2 border-[var(--vermillion)] pl-4 py-2 text-sm text-[var(--ink-light)] italic leading-relaxed">
+            {mode === "guided" && !currentPathPrompt && (
+              <div className="border-l-2 border-[var(--vermillion)] pl-4 py-2 text-base text-[var(--ink-light)] italic leading-relaxed">
                 {isLoadingPrompt ? (
                   <span className="animate-pulse text-[var(--ink-light)] opacity-50">
                     Generating your prompt...
@@ -366,14 +371,14 @@ function HomePage() {
               }}
               placeholder="What's on your mind today?"
               rows={12}
-              className="w-full resize-none text-[var(--ink)] text-sm leading-relaxed bg-transparent focus:outline-none placeholder:text-[var(--ink-light)] placeholder:opacity-50"
+              className="w-full resize-none text-[var(--ink)] text-base leading-relaxed bg-transparent focus:outline-none placeholder:text-[var(--ink-light)] placeholder:opacity-50"
             />
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[var(--ink-light)] opacity-50">{wordCount} words</span>
+              <span className="text-sm text-[var(--ink-light)] opacity-50">{wordCount} words</span>
               <button
                 onClick={handleSubmit}
                 disabled={!content.trim() || isSubmitting}
-                className="ink-cta py-2 px-5 text-sm disabled:opacity-40"
+                className="ink-cta py-2 px-5 text-base disabled:opacity-40"
               >
                 {isSubmitting ? "Analyzing..." : "Submit"}
               </button>

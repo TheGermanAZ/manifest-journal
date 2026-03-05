@@ -39,16 +39,16 @@ export function RelatedEntries({ content, onEntryClick }: RelatedEntriesProps) {
 
   return (
     <div className="border border-[rgba(26,26,26,0.08)] bg-[rgba(255,255,255,0.3)] p-3 flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-wide text-[var(--ink-light)] font-medium">
+      <p className="text-xs uppercase tracking-wide text-[var(--ink-light)] font-medium">
         {isLoading ? "Finding related entries..." : "Related entries"}
       </p>
       {related.map((entry: any) => (
         <button
           key={entry._id}
           onClick={() => onEntryClick?.(entry._id)}
-          className="text-left p-2 text-xs text-[var(--ink-light)] hover:text-[var(--ink)] hover:bg-[rgba(26,26,26,0.02)] transition-colors"
+          className="text-left p-2 text-sm text-[var(--ink-light)] hover:text-[var(--ink)] hover:bg-[rgba(26,26,26,0.02)] transition-colors"
         >
-          <span className="text-[10px] text-[var(--ink-light)]">
+          <span className="text-xs text-[var(--ink-light)]">
             {new Date(entry._creationTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
           </span>
           {" — "}

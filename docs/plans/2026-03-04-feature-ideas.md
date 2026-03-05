@@ -259,3 +259,61 @@ If picking 3 to build first:
 make more prompts to send to the ai to give personas, goal traking and periodically chick in with goals,
 accountability for goals, do you notice any pattterns over the entries, are there any area where they are
 stuck, or inspiration, also make a view that shows what a filled out dashboard would look like to test it out, and maybe have one that shows it off.
+
+# Example Manifesto
+
+# The Dream Manifesto
+
+I refuse to sleepwalk through my own life.
+
+I was not placed here to be comfortable. I was not given a mind so I could think small, play it safe, and arrive at death with a perfectly intact reputation and nothing to show for it. I was given fire, and I intend to use it.
+
+## I. On Dreams Themselves
+
+My dreams are not luxuries. They are not idle fantasies I entertain when the real work is done. They _are_ the real work. Every great thing that has ever existed — every building, every movement, every piece of music that made someone weep — started as an image in someone's mind that the rest of the world called impractical.
+
+I will not apologize for the size of what I want. I will not shrink my vision to fit the comfort zone of people who stopped dreaming a long time ago.
+
+## II. On Fear
+
+Fear will walk beside me. That's fine. I am not waiting for the day I feel no fear — that day does not exist, and anyone who says otherwise is selling something. Courage was never the absence of fear. It is the decision that something else matters more.
+
+I will let fear inform me, but I will never let it choose for me.
+
+## III. On Failure
+
+I will fail. Repeatedly. Publicly. Spectacularly. And I will not treat failure as evidence that I was wrong to try. Failure is the tax on ambition, and I will pay it gladly.
+
+Every person I admire has a graveyard of failed attempts they rarely talk about. I will build mine without shame.
+
+## IV. On Time
+
+I have less of it than I think. This is not meant to frighten me — it is meant to free me. Urgency is a gift. It burns away the trivial and leaves only what matters.
+
+I will stop saying "someday." Someday is a coffin with a nicer name. Today is imperfect, I am unprepared, and the conditions will never be ideal. I'm starting anyway.
+
+## V. On Other People
+
+I will surround myself with people who make me feel like anything is possible — not because they flatter me, but because they challenge me. I will release, with love, anyone who needs me to stay small so they can feel safe.
+
+I will not crowdsource my convictions. The world is full of well-meaning people who will hand me a smaller life and call it wisdom. I will listen to advice. I will not obey fear disguised as advice.
+
+## VI. On the Work
+
+Inspiration is a visitor. Discipline is a roommate. I will not wait to feel ready, motivated, or moved. I will sit down and do the work on the days I feel nothing, because that is where the real progress lives — in the unglamorous hours that nobody sees.
+
+I will fall in love with the process, not just the destination. The destination can change. The process is who I become.
+
+## VII. On Legacy
+
+I do not need to change the entire world. But I refuse to leave it exactly as I found it. My dream does not need to be loud. It needs to be mine. A life lived in full pursuit of something meaningful — that alone is a kind of revolution.
+
+## The Declaration
+
+I am not waiting for permission. I am not waiting for the right moment. I am not waiting for someone to tell me I'm ready.
+
+I am declaring, here and now, that my dreams are worth the risk, the discomfort, the uncertainty, and the long, unglamorous work of making them real.
+
+This is my one life. I will not spend it rehearsing.
+
+I'm going.

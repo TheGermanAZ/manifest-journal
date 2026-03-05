@@ -37,7 +37,7 @@ function DashboardPage() {
   if (stats === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--ink-light)] text-sm">
+        <div className="animate-pulse text-[var(--ink-light)] text-base">
           Loading dashboard...
         </div>
       </div>
@@ -55,23 +55,23 @@ function DashboardPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="display-title font-normal text-lg text-[var(--ink)]">Momentum</h1>
+          <h1 className="display-title font-normal text-xl text-[var(--ink)]">Momentum</h1>
           <div className="flex gap-2">
             <button
               onClick={() => setShowShare(true)}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Share
             </button>
             <button
               onClick={() => navigate({ to: "/weekly" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Weekly
             </button>
             <button
               onClick={() => navigate({ to: "/" })}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
             >
               Journal
             </button>
@@ -81,10 +81,10 @@ function DashboardPage() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               {stats.streak}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">day streak</span>
+            <span className="text-sm text-[var(--ink-light)]">day streak</span>
             {stats.graceDaysPerWeek > 0 && (
               <div className="flex gap-1 mt-1" title={`${stats.graceDaysUsedThisWeek} of ${stats.graceDaysPerWeek} grace days used this week`}>
                 {Array.from({ length: stats.graceDaysPerWeek }).map((_, i) => (
@@ -101,44 +101,44 @@ function DashboardPage() {
             )}
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               {stats.totalEntries}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">entries</span>
+            <span className="text-sm text-[var(--ink-light)]">entries</span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)] capitalize">
+            <span className="text-3xl font-bold text-[var(--ink)] capitalize">
               {topTone ? topTone[0] : "--"}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">top tone</span>
+            <span className="text-sm text-[var(--ink-light)]">top tone</span>
           </div>
         </div>
 
         {/* Writing stats row */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               {(stats.totalWords ?? 0).toLocaleString()}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">total words</span>
+            <span className="text-sm text-[var(--ink-light)]">total words</span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               {stats.avgWordCount ?? 0}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">avg words/entry</span>
+            <span className="text-sm text-[var(--ink-light)]">avg words/entry</span>
           </div>
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col items-center gap-1">
-            <span className="text-2xl font-bold text-[var(--ink)]">
+            <span className="text-3xl font-bold text-[var(--ink)]">
               {formatWritingTime(stats.totalWritingTimeMs ?? 0)}
             </span>
-            <span className="text-xs text-[var(--ink-light)]">writing time</span>
+            <span className="text-sm text-[var(--ink-light)]">writing time</span>
           </div>
         </div>
 
         {/* Alignment trend */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">
+          <h2 className="text-base font-medium text-[var(--ink)]">
             Alignment Trend
           </h2>
           <AlignmentChart data={stats.alignmentTrend} />
@@ -146,9 +146,9 @@ function DashboardPage() {
 
         {/* Emotional arc */}
         <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-          <h2 className="text-sm font-medium text-[var(--ink)]">Emotional Arc</h2>
+          <h2 className="text-base font-medium text-[var(--ink)]">Emotional Arc</h2>
           {Object.keys(stats.toneCounts).length === 0 ? (
-            <p className="text-sm text-[var(--ink-light)] text-center py-4">
+            <p className="text-base text-[var(--ink-light)] text-center py-4">
               No emotional data yet
             </p>
           ) : (
@@ -158,7 +158,7 @@ function DashboardPage() {
                 .map(([tone, count]) => (
                   <span
                     key={tone}
-                    className="px-3 py-1.5 bg-stone-100 text-stone-600 text-xs font-medium"
+                    className="px-3 py-1.5 bg-stone-100 text-stone-600 text-sm font-medium"
                   >
                     {tone} x {count}
                   </span>
@@ -177,10 +177,10 @@ function DashboardPage() {
         {weeklySummaries && weeklySummaries.length > 0 && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium text-[var(--ink)]">Latest Weekly Reflection</h2>
+              <h2 className="text-base font-medium text-[var(--ink)]">Latest Weekly Reflection</h2>
               <button
                 onClick={() => navigate({ to: "/weekly" })}
-                className="text-xs text-[var(--ink-light)] underline underline-offset-2 hover:text-[var(--vermillion)] transition-colors"
+                className="text-sm text-[var(--ink-light)] underline underline-offset-2 hover:text-[var(--vermillion)] transition-colors"
               >
                 View all
               </button>
@@ -192,12 +192,12 @@ function DashboardPage() {
         {/* Milestones */}
         {milestones && milestones.length > 0 && (
           <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-3">
-            <h2 className="text-sm font-medium text-[var(--ink)]">Milestones</h2>
+            <h2 className="text-base font-medium text-[var(--ink)]">Milestones</h2>
             <div className="flex flex-wrap gap-2">
               {milestones.map((m) => {
                 const config = milestoneConfig[m.type];
                 return (
-                  <span key={m._id} className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full">
+                  <span key={m._id} className="inline-flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-700 text-sm font-medium rounded-full">
                     {config?.icon ?? "\u2726"} {config?.title ?? m.type}
                   </span>
                 );
@@ -209,7 +209,7 @@ function DashboardPage() {
         {/* Profile link */}
         <button
           onClick={() => navigate({ to: "/profile" })}
-          className="text-sm text-[var(--ink-light)] underline underline-offset-2 text-center hover:text-[var(--vermillion)] transition-colors"
+          className="text-base text-[var(--ink-light)] underline underline-offset-2 text-center hover:text-[var(--vermillion)] transition-colors"
         >
           View &amp; edit dream profile
         </button>

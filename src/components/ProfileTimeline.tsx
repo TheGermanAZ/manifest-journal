@@ -8,7 +8,7 @@ export function ProfileTimeline() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-sm font-medium text-[var(--ink)]">
+      <h2 className="text-base font-medium text-[var(--ink)]">
         Profile Evolution
       </h2>
       <div className="relative pl-6 flex flex-col gap-4">
@@ -22,10 +22,10 @@ export function ProfileTimeline() {
 
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-[var(--ink)]">
+                <span className="text-sm font-medium text-[var(--ink)]">
                   v{v.version}
                 </span>
-                <span className="text-[10px] text-[var(--ink-light)]">
+                <span className="text-xs text-[var(--ink-light)]">
                   {new Date(v._creationTime).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
@@ -39,7 +39,7 @@ export function ProfileTimeline() {
                   {v.changedFields.map((field) => (
                     <span
                       key={field}
-                      className="px-1.5 py-0.5 bg-stone-100 text-stone-600 text-[10px] capitalize"
+                      className="px-1.5 py-0.5 bg-stone-100 text-stone-600 text-xs capitalize"
                     >
                       {field}
                     </span>
@@ -48,7 +48,7 @@ export function ProfileTimeline() {
               )}
 
               {v.aiCommentary && (
-                <p className="text-xs text-[var(--ink-light)] italic mt-1">
+                <p className="text-sm text-[var(--ink-light)] italic mt-1">
                   {v.aiCommentary}
                 </p>
               )}

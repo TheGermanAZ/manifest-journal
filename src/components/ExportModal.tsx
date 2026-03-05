@@ -67,30 +67,30 @@ export function ExportModal({ onClose }: ExportModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <div className="bg-[var(--paper)] border border-[rgba(26,26,26,0.12)] p-6 max-w-sm mx-4 flex flex-col gap-4 shadow-lg">
-        <h2 className="display-title text-lg font-normal text-[var(--ink)]">
+        <h2 className="display-title text-xl font-normal text-[var(--ink)]">
           Export Journal
         </h2>
 
         <div className="flex flex-col gap-3">
           <div className="flex gap-2">
             <div className="flex-1 flex flex-col gap-1">
-              <label className="text-[10px] text-[var(--ink-light)]">
+              <label className="text-xs text-[var(--ink-light)]">
                 From
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="text-xs border border-[rgba(26,26,26,0.12)] bg-transparent p-1.5"
+                className="text-sm border border-[rgba(26,26,26,0.12)] bg-transparent p-1.5"
               />
             </div>
             <div className="flex-1 flex flex-col gap-1">
-              <label className="text-[10px] text-[var(--ink-light)]">To</label>
+              <label className="text-xs text-[var(--ink-light)]">To</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="text-xs border border-[rgba(26,26,26,0.12)] bg-transparent p-1.5"
+                className="text-sm border border-[rgba(26,26,26,0.12)] bg-transparent p-1.5"
               />
             </div>
           </div>
@@ -102,7 +102,7 @@ export function ExportModal({ onClose }: ExportModalProps) {
               onChange={(e) => setBookmarkedOnly(e.target.checked)}
               className="accent-[var(--vermillion)]"
             />
-            <span className="text-xs text-[var(--ink)]">Bookmarked only</span>
+            <span className="text-sm text-[var(--ink)]">Bookmarked only</span>
           </label>
 
           <label className="flex items-center gap-2 cursor-pointer">
@@ -112,15 +112,15 @@ export function ExportModal({ onClose }: ExportModalProps) {
               onChange={(e) => setIncludeAnalysis(e.target.checked)}
               className="accent-[var(--vermillion)]"
             />
-            <span className="text-xs text-[var(--ink)]">
-              Include AI analysis
+            <span className="text-sm text-[var(--ink)]">
+              Include coach analysis
             </span>
           </label>
 
           <div className="flex gap-2">
             <button
               onClick={() => setFormat("text")}
-              className={`flex-1 py-1.5 text-xs border transition-colors ${
+              className={`flex-1 py-1.5 text-sm border transition-colors ${
                 format === "text"
                   ? "border-[var(--ink)] text-[var(--ink)]"
                   : "border-[rgba(26,26,26,0.12)] text-[var(--ink-light)]"
@@ -130,7 +130,7 @@ export function ExportModal({ onClose }: ExportModalProps) {
             </button>
             <button
               onClick={() => setFormat("json")}
-              className={`flex-1 py-1.5 text-xs border transition-colors ${
+              className={`flex-1 py-1.5 text-sm border transition-colors ${
                 format === "json"
                   ? "border-[var(--ink)] text-[var(--ink)]"
                   : "border-[rgba(26,26,26,0.12)] text-[var(--ink-light)]"
@@ -142,20 +142,20 @@ export function ExportModal({ onClose }: ExportModalProps) {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-xs text-[var(--ink-light)]">
+          <span className="text-sm text-[var(--ink-light)]">
             {entries ? `${entries.length} entries` : "Loading..."}
           </span>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="text-xs text-[var(--ink-light)] px-3 py-1.5"
+              className="text-sm text-[var(--ink-light)] px-3 py-1.5"
             >
               Cancel
             </button>
             <button
               onClick={handleExport}
               disabled={!entries || entries.length === 0}
-              className="ink-cta py-1.5 px-4 text-xs disabled:opacity-40"
+              className="ink-cta py-1.5 px-4 text-sm disabled:opacity-40"
             >
               Export
             </button>

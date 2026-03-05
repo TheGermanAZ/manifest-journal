@@ -25,12 +25,12 @@ function PathsPage() {
     <div className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h1 className="display-title font-normal text-lg text-[var(--ink)]">
+          <h1 className="display-title font-normal text-xl text-[var(--ink)]">
             Guided Paths
           </h1>
           <button
             onClick={() => navigate({ to: "/" })}
-            className="text-xs text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
+            className="text-sm text-[var(--ink-light)] px-3 py-1.5 border border-[rgba(26,26,26,0.15)] bg-transparent hover:border-[var(--ink)] transition-colors"
           >
             Journal
           </button>
@@ -39,10 +39,10 @@ function PathsPage() {
         {activePath && (
           <div className="bg-[rgba(255,255,255,0.5)] border border-[var(--vermillion)] p-4 flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-[var(--ink)]">
+              <span className="text-base font-medium text-[var(--ink)]">
                 Active: {activePath.path.name}
               </span>
-              <span className="text-xs text-[var(--ink-light)]">
+              <span className="text-sm text-[var(--ink-light)]">
                 Day {activePath.progress.currentDay}/{activePath.path.duration}
               </span>
             </div>
@@ -57,7 +57,7 @@ function PathsPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate({ to: "/" })}
-                className="ink-cta py-1.5 px-4 text-xs"
+                className="ink-cta py-1.5 px-4 text-sm"
               >
                 Continue journaling
               </button>
@@ -67,7 +67,7 @@ function PathsPage() {
                     progressId: activePath.progress._id as any,
                   })
                 }
-                className="text-xs text-[var(--ink-light)] hover:text-[var(--vermillion)]"
+                className="text-sm text-[var(--ink-light)] hover:text-[var(--vermillion)]"
               >
                 Abandon path
               </button>
@@ -77,11 +77,11 @@ function PathsPage() {
 
         <div className="flex flex-col gap-3">
           {paths === undefined ? (
-            <div className="animate-pulse text-[var(--ink-light)] text-sm text-center py-8">
+            <div className="animate-pulse text-[var(--ink-light)] text-base text-center py-8">
               Loading...
             </div>
           ) : paths.length === 0 ? (
-            <p className="text-[var(--ink-light)] text-sm text-center py-8">
+            <p className="text-[var(--ink-light)] text-base text-center py-8">
               No paths available yet.
             </p>
           ) : (

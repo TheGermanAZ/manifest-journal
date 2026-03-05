@@ -5,7 +5,7 @@ interface AlignmentChartProps {
 export function AlignmentChart({ data }: AlignmentChartProps) {
   if (data.length === 0) {
     return (
-      <p className="text-sm text-[var(--ink-light)] text-center py-8">No data yet</p>
+      <p className="text-base text-[var(--ink-light)] text-center py-8">No data yet</p>
     );
   }
 
@@ -26,7 +26,7 @@ export function AlignmentChart({ data }: AlignmentChartProps) {
               className={`w-full rounded-sm ${color}`}
               style={{ height: `${height}px` }}
             />
-            <span className="text-[10px] text-[var(--ink-light)]">{point.date}</span>
+            <span className="text-xs text-[var(--ink-light)]">{point.date}</span>
           </div>
         );
       })}

@@ -15,8 +15,8 @@ describe("AlignmentDial", () => {
     expect(screen.getByText("You're on the right track")).toBeInTheDocument();
   });
 
-  it('renders "out of 10" label', () => {
+  it("renders the score label", () => {
     render(<AlignmentDial score={9} rationale="Excellent alignment" />);
-    expect(screen.getByText("out of 10")).toBeInTheDocument();
+    expect(screen.getByText("Deeply aligned")).toBeInTheDocument();
   });
 });

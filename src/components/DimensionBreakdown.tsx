@@ -8,7 +8,7 @@ export function DimensionBreakdown() {
 
   return (
     <div className="bg-[rgba(255,255,255,0.5)] border border-[rgba(26,26,26,0.12)] p-4 flex flex-col gap-4">
-      <h2 className="text-sm font-medium text-[var(--ink)]">
+      <h2 className="text-base font-medium text-[var(--ink)]">
         Dimension Balance
       </h2>
 
@@ -26,7 +26,7 @@ export function DimensionBreakdown() {
         {insights.dimensions.map((dim) => (
           <div
             key={dim.name}
-            className="flex items-center justify-between text-xs"
+            className="flex items-center justify-between text-sm"
           >
             <span className="capitalize text-[var(--ink)]">{dim.name}</span>
             <div className="flex items-center gap-2">
@@ -44,7 +44,7 @@ export function DimensionBreakdown() {
       {/* Neglect callouts */}
       {insights.mostNeglected.length > 0 && (
         <div className="border-t border-[rgba(26,26,26,0.08)] pt-3">
-          <p className="text-xs text-[var(--vermillion)]">
+          <p className="text-sm text-[var(--vermillion)]">
             Most neglected: {insights.mostNeglected.join(", ")}
           </p>
         </div>
