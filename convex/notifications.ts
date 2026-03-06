@@ -4,10 +4,12 @@ import { internal } from "./_generated/api";
 import { getAppUserId, requireAppUser } from "./lib/authHelper";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
-});
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+  });
+}
 
 export const updateNotificationPreferences = mutation({
   args: {
@@ -117,7 +119,7 @@ export const sendMorningPrompt = internalAction({
 
     let prompt: string;
     try {
-      const response = await openai.chat.completions.create({
+      const response = await getOpenAI().chat.completions.create({
         model: "google/gemini-3.1-flash-lite-preview",
         max_tokens: 100,
         messages: [

@@ -89,6 +89,7 @@ function LoginPage() {
           </div>
         ) : (
           <>
+            {/* Email magic link sign-in temporarily disabled
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-sm font-medium tracking-wide uppercase text-[var(--ink-light)]">
@@ -116,6 +117,7 @@ function LoginPage() {
               <span className="text-sm text-[var(--ink-light)] tracking-wide">or</span>
               <div className="h-px flex-1 bg-[rgba(26,26,26,0.1)]" />
             </div>
+            */}
             <button
               type="button"
               onClick={handleDiscord}
