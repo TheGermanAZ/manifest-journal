@@ -7,7 +7,7 @@ describe("ManifestoEditor", () => {
   it("renders textarea with placeholder", () => {
     render(<ManifestoEditor value="" onChange={vi.fn()} />);
     expect(
-      screen.getByPlaceholderText(/my ideal life/i),
+      screen.getByPlaceholderText(/five pillars/i),
     ).toBeInTheDocument();
   });
 
@@ -15,14 +15,19 @@ describe("ManifestoEditor", () => {
     const onChange = vi.fn();
     render(<ManifestoEditor value="" onChange={onChange} />);
     await userEvent.type(
-      screen.getByPlaceholderText(/my ideal life/i),
+      screen.getByPlaceholderText(/five pillars/i),
       "a",
     );
     expect(onChange).toHaveBeenCalled();
   });
 
-  it("shows word count", () => {
+  it("shows word count when non-empty", () => {
     render(<ManifestoEditor value="hello world" onChange={vi.fn()} />);
     expect(screen.getByText(/2 words/)).toBeInTheDocument();
+  });
+
+  it("hides word count when empty", () => {
+    render(<ManifestoEditor value="" onChange={vi.fn()} />);
+    expect(screen.queryByText(/words/)).not.toBeInTheDocument();
   });
 });

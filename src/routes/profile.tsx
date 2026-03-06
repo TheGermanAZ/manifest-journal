@@ -97,7 +97,7 @@ function ProfilePage() {
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Your manifesto</label>
+            <label className="text-xs font-medium uppercase tracking-wide text-[var(--ink-light)]">Anything else</label>
             <div className="flex gap-2">
               <button
                 onClick={handleRegenerateManifesto}
@@ -120,7 +120,7 @@ function ProfilePage() {
               className="border border-[rgba(26,26,26,0.12)] bg-[rgba(255,255,255,0.5)] p-4 text-base text-[var(--ink)] leading-relaxed whitespace-pre-wrap cursor-pointer"
               onClick={() => setEditingManifesto(true)}
             >
-              {manifesto || <span className="text-[var(--ink-light)] italic">Fill in your dimensions above to generate your manifesto</span>}
+              {manifesto || <span className="text-[var(--ink-light)] italic">Add anything about your dream life that doesn't fit into the five pillars</span>}
             </div>
           )}
         </div>
