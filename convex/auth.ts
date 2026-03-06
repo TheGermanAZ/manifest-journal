@@ -8,7 +8,45 @@ import { betterAuth } from "better-auth/minimal";
 import authConfig from "./auth.config";
 
 const convexSiteUrl = process.env.CONVEX_SITE_URL!;
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:3000";
+const localhostOrigin = "http://localhost:3000";
+
+function parseOrigins(value?: string) {
+  return (value ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+const configuredClientOrigins = Array.from(
+  new Set([
+    ...parseOrigins(process.env.CLIENT_ORIGINS),
+    ...parseOrigins(process.env.CLIENT_ORIGIN),
+  ]),
+);
+
+const siteUrl =
+  process.env.SITE_URL ||
+  configuredClientOrigins[0] ||
+  localhostOrigin;
+
+function isAllowedOrigin(origin: string) {
+  if (!origin) return false;
+
+  if (configuredClientOrigins.includes(origin)) {
+    return true;
+  }
+
+  if (origin === localhostOrigin) {
+    return true;
+  }
+
+  try {
+    const { protocol, hostname } = new URL(origin);
+    return protocol === "https:" && hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+}
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
@@ -20,7 +58,20 @@ export const createAuth = (
     logger: { disabled: optionsOnly },
     baseURL: convexSiteUrl,
     secret: process.env.BETTER_AUTH_SECRET,
-    trustedOrigins: [clientOrigin, "http://localhost:3000", "https://*.vercel.app"],
+    trustedOrigins: (request) => {
+      const requestOrigin = request.headers.get("origin") ?? "";
+      const trustedOrigins = new Set([
+        siteUrl,
+        localhostOrigin,
+        ...configuredClientOrigins,
+      ]);
+
+      if (requestOrigin && isAllowedOrigin(requestOrigin)) {
+        trustedOrigins.add(requestOrigin);
+      }
+
+      return Array.from(trustedOrigins);
+    },
     database: authComponent.adapter(ctx),
     account: {
       storeStateStrategy: "database",
@@ -34,7 +85,7 @@ export const createAuth = (
     },
     plugins: [
       convex({ authConfig }),
-      crossDomain({ siteUrl: clientOrigin }),
+      crossDomain({ siteUrl }),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
           const safeUrl = url
