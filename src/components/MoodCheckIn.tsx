@@ -14,7 +14,11 @@ const moods = [
   { tone: "excited", emoji: "\u26A1", label: "Excited" },
 ] as const;
 
-export function MoodCheckIn() {
+interface MoodCheckInProps {
+  onComplete?: (entryId: string) => Promise<void>;
+}
+
+export function MoodCheckIn({ onComplete }: MoodCheckInProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,10 +29,13 @@ export function MoodCheckIn() {
     if (!selected) return;
     setIsSubmitting(true);
     try {
-      await createCheckIn({
+      const entryId = await createCheckIn({
         selectedTone: selected as any,
         note: note.trim() || undefined,
       });
+      if (onComplete && entryId) {
+        await onComplete(entryId as string);
+      }
       navigate({ to: "/dashboard" });
     } finally {
       setIsSubmitting(false);

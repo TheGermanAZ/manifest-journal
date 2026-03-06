@@ -211,6 +211,15 @@ function HomePage() {
         dreamProfile: user.dreamProfile,
         recentEntries: recentForAnalysis,
       });
+
+      // Advance path progress if on an active path
+      if (activePath) {
+        await completeDayAndAdvance({
+          progressId: activePath.progress._id as any,
+          entryId: conversationEntryId as any,
+        });
+      }
+
       navigate({
         to: "/response/$entryId",
         params: { entryId: conversationEntryId },
@@ -338,7 +347,12 @@ function HomePage() {
 
         {/* Editor / Conversation / Check-in */}
         {showCheckIn ? (
-          <MoodCheckIn />
+          <MoodCheckIn onComplete={activePath ? async (entryId) => {
+            await completeDayAndAdvance({
+              progressId: activePath.progress._id as any,
+              entryId: entryId as any,
+            });
+          } : undefined} />
         ) : mode === "conversational" ? (
           <ConversationView
             turns={turns}

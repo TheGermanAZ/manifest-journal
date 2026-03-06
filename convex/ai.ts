@@ -4,10 +4,12 @@ import { api, internal } from "./_generated/api";
 import OpenAI from "openai";
 import { authComponent } from "./auth";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1",
-});
+function getOpenAI() {
+  return new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+  });
+}
 
 const MODEL = "google/gemini-3.1-flash-lite-preview";
 
@@ -96,7 +98,7 @@ export const analyzeEntry = action({
     const recent = args.recentEntries.slice(0, 10);
     const recentContext = formatRecentEntries(recent);
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 800,
       messages: [
@@ -234,7 +236,7 @@ export const generateDailyPrompt = action({
     const recent = args.recentEntries.slice(0, 10);
     const recentContext = formatRecentEntries(recent);
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 100,
       messages: [
@@ -291,7 +293,7 @@ export const conversationalTurn = action({
 
     const history = args.history.slice(-20);
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 200,
       messages: [
@@ -322,7 +324,7 @@ export const generateEmbedding = internalAction({
   args: { text: v.string() },
   handler: async (_ctx, args): Promise<number[]> => {
     // Use OpenAI-compatible embedding via OpenRouter
-    const response = await openai.embeddings.create({
+    const response = await getOpenAI().embeddings.create({
       model: "openai/text-embedding-3-small",
       input: args.text.slice(0, 8000), // Limit input length
     });
