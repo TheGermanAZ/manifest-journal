@@ -40,9 +40,10 @@ function OnboardingFlow() {
     creative: "",
   });
 
-  const wordCount =
-    manifesto.trim() === "" ? 0 : manifesto.trim().split(/\s+/).length;
-  const canContinue = wordCount >= 50;
+  const filledPillars = Object.values(categories).filter(
+    (v) => v.trim().length > 0,
+  ).length;
+  const canContinue = filledPillars >= 1;
 
   const handleCategoryChange = (key: string, value: string) => {
     setCategories((prev) => ({ ...prev, [key]: value }));
@@ -74,14 +75,24 @@ function OnboardingFlow() {
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="display-title text-3xl font-normal tracking-tight text-[var(--ink)]">
-                Your Dream Life Manifesto
+                Life Dimensions
               </h1>
               <p className="mt-1 text-base text-[var(--ink-light)]">
-                Step 1 of 2 &mdash; Write freely about your ideal life
+                Step 1 of 2 &mdash; Define your vision for each area
               </p>
             </div>
 
-            <ManifestoEditor value={manifesto} onChange={setManifesto} />
+            <div className="flex flex-col gap-4">
+              {CATEGORIES.map(({ key, label }) => (
+                <CategoryCard
+                  key={key}
+                  category={key}
+                  label={label}
+                  value={categories[key]}
+                  onChange={(v) => handleCategoryChange(key, v)}
+                />
+              ))}
+            </div>
 
             <button
               onClick={() => setStep(2)}
@@ -97,24 +108,15 @@ function OnboardingFlow() {
           <div className="flex flex-col gap-6">
             <div>
               <h1 className="display-title text-3xl font-normal tracking-tight text-[var(--ink)]">
-                Life Dimensions
+                Anything else?
               </h1>
               <p className="mt-1 text-base text-[var(--ink-light)]">
-                Step 2 of 2 &mdash; Define your vision for each area
+                Step 2 of 2 &mdash; Optionally write freely about your ideal
+                life
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {CATEGORIES.map(({ key, label }) => (
-                <CategoryCard
-                  key={key}
-                  category={key}
-                  label={label}
-                  value={categories[key]}
-                  onChange={(v) => handleCategoryChange(key, v)}
-                />
-              ))}
-            </div>
+            <ManifestoEditor value={manifesto} onChange={setManifesto} />
 
             <div className="flex justify-between">
               <button
