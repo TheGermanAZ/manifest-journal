@@ -9,5 +9,9 @@ const http = httpRouter();
 http.route({ path: "/health", method: "GET", handler: shallow });
 http.route({ path: "/health/ready", method: "GET", handler: ready });
 
-authComponent.registerRoutes(http, createAuth, { cors: true });
+authComponent.registerRoutes(http, createAuth, {
+  cors: {
+    allowedOrigins: ["*.vercel.app"],
+  },
+});
 export default http;
