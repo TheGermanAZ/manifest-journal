@@ -22,6 +22,16 @@ export function ConversationView({
 }: ConversationViewProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea to fit content
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [input]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -101,9 +111,10 @@ export function ConversationView({
       )}
 
       {/* Input area */}
-      <div className="border-t border-[rgba(26,26,26,0.08)] px-5 py-3 flex gap-2">
-        <input
-          type="text"
+      <div className="border-t border-[rgba(26,26,26,0.08)] px-5 py-3 flex gap-2 items-end">
+        <textarea
+          ref={textareaRef}
+          rows={1}
           value={input}
           onChange={(e) => {
             if (!input && e.target.value && onStartWriting) onStartWriting();
@@ -112,7 +123,7 @@ export function ConversationView({
           onKeyDown={handleKeyDown}
           placeholder="Type a message..."
           disabled={isLoading}
-          className="flex-1 text-base text-[var(--ink)] bg-transparent focus:outline-none disabled:opacity-50 placeholder:text-[var(--ink-light)] placeholder:opacity-50"
+          className="flex-1 text-base text-[var(--ink)] bg-transparent focus:outline-none disabled:opacity-50 placeholder:text-[var(--ink-light)] placeholder:opacity-50 resize-none leading-relaxed max-h-48 overflow-y-auto"
         />
         <button
           onClick={handleSend}
