@@ -9,6 +9,7 @@ import { PathProgressBanner } from "../components/PathProgressBanner";
 import { LandingPage } from "../components/LandingPage";
 import { authClient } from "../lib/auth-client";
 import { useAuthSettled } from "../lib/useAuthSettled";
+import { formatError } from "../lib/errors";
 
 export const Route = createFileRoute("/")({
   component: IndexPage,
@@ -43,6 +44,7 @@ function HomePage() {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const writingStartedAt = useRef<number | null>(null);
   const [seededPrompt, setSeededPrompt] = useState(false);
 
@@ -77,7 +79,19 @@ function HomePage() {
   const abandonPath = useMutation(api.paths.abandonPath);
   const addTurn = useMutation(api.conversations.addTurn);
   const convoTurn = useAction(api.ai.conversationalTurn);
+  const ensureUser = useMutation(api.users.ensureUser);
   const navigate = useNavigate();
+  const hasProvisioned = useRef(false);
+
+  // Provision app user row on first load (mirrors AuthGuard behavior)
+  useEffect(() => {
+    if (!hasProvisioned.current) {
+      hasProvisioned.current = true;
+      ensureUser().catch((err) =>
+        console.error("Failed to ensure user:", err),
+      );
+    }
+  }, [ensureUser]);
 
   const hasDreamProfile = !!user?.dreamProfile;
 
@@ -129,6 +143,14 @@ function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, hasDreamProfile, currentPathPrompt]);
 
+  if (user === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[var(--ink-light)] text-base">Loading...</div>
+      </div>
+    );
+  }
+
   if (user && !hasDreamProfile) {
     return null;
   }
@@ -137,6 +159,7 @@ function HomePage() {
   const handleConvoSend = async (message: string) => {
     if (!user?.dreamProfile) return;
     setIsTurnLoading(true);
+    setSubmitError(null);
     const userTurn = { role: "user" as const, content: message };
     setTurns((prev) => [...prev, userTurn]);
 
@@ -186,6 +209,9 @@ function HomePage() {
         ...prev,
         { role: "assistant", content: assistantContent },
       ]);
+    } catch (err) {
+      console.error("[handleConvoSend]", err);
+      setSubmitError(formatError(err));
     } finally {
       setIsTurnLoading(false);
     }
@@ -194,6 +220,7 @@ function HomePage() {
   const handleConvoFinish = async () => {
     if (!conversationEntryId || !user?.dreamProfile) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const fullContent = turns
         .filter((t) => t.role === "user")
@@ -224,6 +251,9 @@ function HomePage() {
         to: "/response/$entryId",
         params: { entryId: conversationEntryId },
       });
+    } catch (err) {
+      console.error("[handleConvoFinish]", err);
+      setSubmitError(formatError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -232,6 +262,7 @@ function HomePage() {
   const handleSubmit = async () => {
     if (!content.trim() || !user?.dreamProfile) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const writingDurationMs = writingStartedAt.current
         ? Date.now() - writingStartedAt.current
@@ -260,6 +291,9 @@ function HomePage() {
       }
 
       navigate({ to: "/response/$entryId", params: { entryId } });
+    } catch (err) {
+      console.error("[handleSubmit]", err);
+      setSubmitError(formatError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -387,6 +421,11 @@ function HomePage() {
               rows={12}
               className="w-full resize-none text-[var(--ink)] text-base leading-relaxed bg-transparent focus:outline-none placeholder:text-[var(--ink-light)] placeholder:opacity-50"
             />
+            {submitError && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2">
+                {submitError}
+              </p>
+            )}
             <div className="flex justify-between items-center">
               <span className="text-sm text-[var(--ink-light)] opacity-50">{wordCount} words</span>
               <button
