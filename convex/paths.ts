@@ -2,6 +2,7 @@ import { query, mutation, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAppUserId, requireAppUser } from "./lib/authHelper";
 import { SEED_PATHS } from "./pathSeedData";
+import { ConflictError, NotFoundError, ValidationError } from "./lib/errors";
 
 // Seed paths if none exist
 export const seedPaths = internalMutation({
@@ -50,7 +51,7 @@ export const startPath = mutation({
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
     const active = existing.find((p) => p.status === "active");
-    if (active) throw new Error("Already on a path. Complete or abandon it first.");
+    if (active) throw new ConflictError("Already on a path. Complete or abandon it first.");
 
     return ctx.db.insert("pathProgress", {
       userId,
@@ -72,11 +73,11 @@ export const completeDayAndAdvance = mutation({
     const userId = await requireAppUser(ctx);
     const progress = await ctx.db.get(args.progressId);
     if (!progress || progress.userId !== userId || progress.status !== "active") {
-      throw new Error("Invalid path progress");
+      throw new ValidationError("Invalid path progress", "progressId");
     }
 
     const path = await ctx.db.get(progress.pathId);
-    if (!path) throw new Error("Path not found");
+    if (!path) throw new NotFoundError("Path");
 
     const newCompletions = [
       ...progress.dayCompletions,
@@ -108,7 +109,7 @@ export const abandonPath = mutation({
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
     const progress = await ctx.db.get(args.progressId);
-    if (!progress || progress.userId !== userId) throw new Error("Not found");
+    if (!progress || progress.userId !== userId) throw new NotFoundError("PathProgress");
     await ctx.db.patch(args.progressId, { status: "abandoned" });
   },
 });

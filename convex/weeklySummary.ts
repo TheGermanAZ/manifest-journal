@@ -2,14 +2,9 @@ import { query, internalMutation, internalAction, internalQuery } from "./_gener
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { getAppUserId } from "./lib/authHelper";
-import OpenAI from "openai";
-
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
-  });
-}
+import { getOpenAI } from "./lib/openai";
+import { createLogger } from "./lib/logger";
+import { formatError } from "./lib/errors";
 
 export const generateWeeklySummary = internalAction({
   args: {
@@ -18,6 +13,11 @@ export const generateWeeklySummary = internalAction({
     weekEnding: v.string(),
   },
   handler: async (ctx, args) => {
+    const log = createLogger("weeklySummary.generate", {
+      userId: args.userId,
+      week: `${args.weekStarting}..${args.weekEnding}`,
+    });
+
     const startMs = new Date(args.weekStarting).getTime();
     const endMs = new Date(args.weekEnding).getTime() + 86400000; // include end day
 
@@ -27,7 +27,12 @@ export const generateWeeklySummary = internalAction({
       endMs,
     });
 
-    if (entries.length === 0) return;
+    if (entries.length === 0) {
+      log.info("no entries for week, skipping");
+      return;
+    }
+
+    log.info("generating summary", { entryCount: entries.length });
 
     // Aggregate data
     const tones: string[] = [];
@@ -67,7 +72,7 @@ export const generateWeeklySummary = internalAction({
       .map(([name]) => name);
 
     try {
-      const response = await getOpenAI().chat.completions.create({
+      const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
         model: "google/gemini-3.1-flash-lite-preview",
         max_tokens: 600,
         messages: [
@@ -92,7 +97,7 @@ Return ONLY valid JSON:
 }`,
           },
         ],
-      });
+      }));
 
       const text = response.choices[0]?.message?.content ?? "{}";
       const cleaned = text
@@ -103,6 +108,7 @@ Return ONLY valid JSON:
       try {
         parsed = JSON.parse(cleaned);
       } catch {
+        log.warn("failed to parse AI response as JSON", { rawLength: text.length });
         parsed = {
           emotionalArc: "Unable to analyze this week's entries.",
           alignmentTrendSummary: "Insufficient data.",
@@ -128,8 +134,11 @@ Return ONLY valid JSON:
           neglectedDimensions: topNeglected,
         },
       });
-    } catch {
-      // Silently fail - will retry next week
+      log.done({ avgAlignment, dominantTone });
+    } catch (err) {
+      log.error("weekly summary generation failed", {
+        error: formatError(err),
+      });
     }
   },
 });
@@ -159,8 +168,9 @@ export const storeWeeklySummary = internalMutation({
 export const processAllUsers = internalAction({
   args: {},
   handler: async (ctx) => {
-    // Get all users
+    const log = createLogger("weeklySummary.processAllUsers");
     const users = await ctx.runQuery(internal.weeklySummary.getAllUsers);
+    log.info("scheduling weekly summaries", { userCount: users.length });
 
     const now = new Date();
     const weekEnding = new Date(now);

@@ -2,6 +2,7 @@
 import { authComponent } from "../auth";
 import type { QueryCtx, MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
+import { AuthError } from "./errors";
 
 /**
  * Get the app user's Convex ID from the current auth session.
@@ -39,6 +40,6 @@ export async function requireAppUser(
       q.eq("betterAuthId", authUser._id)
     )
     .unique();
-  if (!user) throw new Error("User not provisioned");
+  if (!user) throw new AuthError("User not provisioned");
   return user._id;
 }

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { authClient } from "../lib/auth-client";
 import { useAuthSettled } from "../lib/useAuthSettled";
+import { formatError } from "../lib/errors";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -41,7 +42,7 @@ function RegisterPage() {
       setSent(true);
     } catch (err) {
       console.error("Magic link sign-in failed:", err);
-      setError(err instanceof Error ? err.message : "Failed to send magic link");
+      setError(formatError(err));
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +58,7 @@ function RegisterPage() {
       });
     } catch (err) {
       console.error("Discord sign-in failed:", err);
-      setError(err instanceof Error ? err.message : "Discord sign-in failed");
+      setError(formatError(err));
     }
   };
 

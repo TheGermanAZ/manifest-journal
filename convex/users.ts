@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { authComponent } from "./auth";
 import { requireAppUser } from "./lib/authHelper";
+import { ValidationError } from "./lib/errors";
 
 export const ensureUser = mutation({
   args: {},
@@ -82,7 +83,7 @@ export const updatePreferences = mutation({
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
     if (args.graceDaysPerWeek < 0 || args.graceDaysPerWeek > 2) {
-      throw new Error("Grace days must be 0, 1, or 2");
+      throw new ValidationError("Grace days must be 0, 1, or 2", "graceDaysPerWeek");
     }
     await ctx.db.patch(userId, {
       preferences: { graceDaysPerWeek: args.graceDaysPerWeek },
@@ -104,9 +105,9 @@ export const updateDreamProfile = mutation({
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
 
-    if (args.manifesto.length > 5000) throw new Error("Manifesto too long");
+    if (args.manifesto.length > 5000) throw new ValidationError("Manifesto too long", "manifesto");
     for (const [key, value] of Object.entries(args.categories)) {
-      if (value.length > 2000) throw new Error(`Category ${key} too long`);
+      if (value.length > 2000) throw new ValidationError(`Category ${key} too long`, key);
     }
 
     // Before patching, snapshot the current profile for evolution tracking

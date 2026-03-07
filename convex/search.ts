@@ -2,12 +2,13 @@ import { action, internalAction, internalQuery } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { authComponent } from "./auth";
+import { AuthError } from "./lib/errors";
 
 export const searchEntries = action({
   args: { query: v.string() },
   handler: async (ctx, args) => {
     const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new Error("Not authenticated");
+    if (!authUser) throw new AuthError();
 
     // Generate embedding for the search query
     const queryEmbedding = await ctx.runAction(internal.ai.generateEmbedding, {
@@ -36,7 +37,7 @@ export const findRelatedEntries = action({
   args: { content: v.string() },
   handler: async (ctx, args) => {
     const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new Error("Not authenticated");
+    if (!authUser) throw new AuthError();
 
     const queryEmbedding = await ctx.runAction(internal.ai.generateEmbedding, {
       text: args.content.slice(0, 500),
