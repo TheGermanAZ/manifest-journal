@@ -10,7 +10,7 @@ import authConfig from "./auth.config";
 const convexSiteUrl = process.env.CONVEX_SITE_URL!;
 const localhostOrigin = "http://localhost:3000";
 
-function parseOrigins(value?: string) {
+export function parseOrigins(value?: string) {
   return (value ?? "")
     .split(",")
     .map((origin) => origin.trim())
@@ -29,7 +29,7 @@ const siteUrl =
   configuredClientOrigins[0] ||
   localhostOrigin;
 
-function isAllowedOrigin(origin: string) {
+export function isAllowedOrigin(origin: string) {
   if (!origin) return false;
 
   if (configuredClientOrigins.includes(origin)) {
@@ -93,7 +93,7 @@ export const createAuth = (
             .replace(/"/g, "&quot;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
-          const res = await fetch("https://api.resend.com/emails", {
+          const payload = {
             method: "POST",
             headers: {
               Authorization: `Bearer ${process.env.AUTH_RESEND_KEY}`,
@@ -105,11 +105,18 @@ export const createAuth = (
               subject: "Sign in to Manifest Journal",
               html: `<p>Click <a href="${safeUrl}">here</a> to sign in to Manifest Journal.</p><p>If you didn't request this, you can safely ignore this email.</p>`,
             }),
-          });
-          if (!res.ok) {
+          };
+          let lastError: Error | null = null;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            const res = await fetch("https://api.resend.com/emails", payload);
+            if (res.ok) return;
             const body = await res.text();
-            throw new Error(`Failed to send magic link email: ${res.status} ${body}`);
+            lastError = new Error(`Failed to send magic link email: ${res.status} ${body}`);
+            // Don't retry client errors (4xx) — only transient server/rate errors
+            if (res.status < 500 && res.status !== 429) throw lastError;
+            if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
           }
+          throw lastError!;
         },
       }),
     ],

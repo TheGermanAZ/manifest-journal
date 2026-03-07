@@ -3,14 +3,9 @@ import { query, internalMutation, internalAction } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { getAppUserId } from "./lib/authHelper";
-import OpenAI from "openai";
-
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
-  });
-}
+import { getOpenAI } from "./lib/openai";
+import { createLogger } from "./lib/logger";
+import { formatError } from "./lib/errors";
 
 export const snapshotCurrentProfile = internalMutation({
   args: {
@@ -68,8 +63,12 @@ export const generateEvolutionCommentary = internalAction({
     changedFields: v.array(v.string()),
   },
   handler: async (ctx, args) => {
+    const log = createLogger("dreamProfile.generateEvolution", {
+      versionId: args.versionId,
+      changedFields: args.changedFields,
+    });
     try {
-      const response = await getOpenAI().chat.completions.create({
+      const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
         model: "google/gemini-3.1-flash-lite-preview",
         max_tokens: 150,
         messages: [
@@ -83,7 +82,7 @@ export const generateEvolutionCommentary = internalAction({
             content: `The user updated their dream profile. Changed fields: ${args.changedFields.join(", ")}.\n\nPrevious manifesto:\n${args.previousManifesto.slice(0, 500)}\n\nNew manifesto:\n${args.currentManifesto.slice(0, 500)}\n\nWhat does this evolution reveal?`,
           },
         ],
-      });
+      }));
       const commentary =
         response.choices[0]?.message?.content?.trim() ?? "";
       await ctx.runMutation(
@@ -93,8 +92,11 @@ export const generateEvolutionCommentary = internalAction({
           aiCommentary: commentary,
         }
       );
-    } catch {
-      // Silently fail - commentary is optional
+      log.done();
+    } catch (err) {
+      log.error("evolution commentary generation failed", {
+        error: formatError(err),
+      });
     }
   },
 });

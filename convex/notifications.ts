@@ -2,14 +2,9 @@ import { query, mutation, internalAction, internalMutation, internalQuery } from
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { getAppUserId, requireAppUser } from "./lib/authHelper";
-import OpenAI from "openai";
-
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
-  });
-}
+import { getOpenAI } from "./lib/openai";
+import { createLogger } from "./lib/logger";
+import { formatError } from "./lib/errors";
 
 export const updateNotificationPreferences = mutation({
   args: {
@@ -40,11 +35,13 @@ export const getNotificationPreferences = query({
 export const processScheduledPrompts = internalAction({
   args: {},
   handler: async (ctx) => {
+    const log = createLogger("notifications.processScheduledPrompts");
     const users = await ctx.runQuery(internal.notifications.getUsersWithNotifications);
     const now = new Date();
     const currentHour = now.getUTCHours();
     const currentMinute = now.getUTCMinutes();
     const dateKey = now.toISOString().split("T")[0];
+    log.info("processing scheduled prompts", { eligibleUsers: users.length, dateKey });
 
     for (const user of users) {
       if (!user.prefs.morningPromptEnabled) continue;
@@ -102,6 +99,7 @@ export const sendMorningPrompt = internalAction({
     dateKey: v.string(),
   },
   handler: async (ctx, args) => {
+    const log = createLogger("notifications.sendMorningPrompt", { userId: args.userId });
     // Get user's recent entries for context
     const entries = await ctx.runQuery(internal.entries.entriesInDateRange, {
       userId: args.userId,
@@ -119,7 +117,7 @@ export const sendMorningPrompt = internalAction({
 
     let prompt: string;
     try {
-      const response = await getOpenAI().chat.completions.create({
+      const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
         model: "google/gemini-3.1-flash-lite-preview",
         max_tokens: 100,
         messages: [
@@ -135,11 +133,14 @@ export const sendMorningPrompt = internalAction({
               : "Generate a motivating morning journaling prompt.",
           },
         ],
-      });
+      }));
       prompt =
         response.choices[0]?.message?.content?.trim() ??
         "What intention will you set for today?";
-    } catch {
+    } catch (err) {
+      log.error("morning prompt generation failed, using fallback", {
+        error: formatError(err),
+      });
       prompt = "What intention will you set for today?";
     }
 
@@ -150,6 +151,7 @@ export const sendMorningPrompt = internalAction({
       dateKey: args.dateKey,
       emailStatus: "pending", // Would be "sent" after Resend integration
     });
+    log.done();
   },
 });
 

@@ -2,6 +2,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { requireAppUser, getAppUserId } from "./lib/authHelper";
+import { NotFoundError } from "./lib/errors";
 
 export const addTurn = mutation({
   args: {
@@ -12,7 +13,7 @@ export const addTurn = mutation({
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
     const entry = await ctx.db.get(args.entryId);
-    if (!entry || entry.userId !== userId) throw new Error("Not found");
+    if (!entry || entry.userId !== userId) throw new NotFoundError("Entry");
     return ctx.db.insert("conversationTurns", {
       entryId: args.entryId,
       userId,

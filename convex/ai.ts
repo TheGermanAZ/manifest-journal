@@ -1,30 +1,25 @@
 import { action, internalAction, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import OpenAI from "openai";
 import { authComponent } from "./auth";
-
-function getOpenAI() {
-  return new OpenAI({
-    apiKey: process.env.OPENROUTER_API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
-  });
-}
+import { getOpenAI } from "./lib/openai";
+import { createLogger } from "./lib/logger";
+import { NotFoundError, formatError } from "./lib/errors";
 
 const MODEL = "google/gemini-3.1-flash-lite-preview";
 
-const EMOTIONAL_TONES = [
+export const EMOTIONAL_TONES = [
   "hopeful", "anxious", "stuck", "clear",
   "resistant", "expansive", "grief", "excited",
 ] as const;
 
-type DimensionData = {
+export type DimensionData = {
   name: string;
   relevance: number;
   alignmentScore: number;
 };
 
-type AnalysisResult = {
+export type AnalysisResult = {
   patternInsight: string;
   nudge: string;
   emotionalTone: (typeof EMOTIONAL_TONES)[number];
@@ -35,6 +30,70 @@ type AnalysisResult = {
   neglectedDimensions: string[];
   dimensionPrompt: string;
 };
+
+const VALID_DIMENSIONS = ["career", "relationships", "health", "wealth", "creative"];
+
+const FALLBACK_ANALYSIS: AnalysisResult = {
+  patternInsight: "Unable to analyze this entry. Please try again.",
+  nudge: "What matters most to you right now?",
+  emotionalTone: "hopeful",
+  alignmentScore: 5,
+  alignmentRationale: "Analysis could not be completed.",
+  breakthroughScore: 3,
+  dimensions: [],
+  neglectedDimensions: [],
+  dimensionPrompt: "",
+};
+
+/** Parse raw AI response text into a validated AnalysisResult.
+ *  Handles: markdown fences, invalid JSON, out-of-range values,
+ *  unknown tones, invalid dimension names. */
+export function parseAndValidateAnalysis(rawText: string): {
+  result: AnalysisResult;
+  parseFailed: boolean;
+} {
+  // Strip markdown code fences if present
+  const cleaned = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+  let parsed: AnalysisResult;
+  let parseFailed = false;
+
+  try {
+    parsed = JSON.parse(cleaned) as AnalysisResult;
+  } catch {
+    return { result: { ...FALLBACK_ANALYSIS }, parseFailed: true };
+  }
+
+  // Validate emotional tone
+  if (!EMOTIONAL_TONES.includes(parsed.emotionalTone)) {
+    parsed.emotionalTone = "hopeful";
+  }
+
+  // Clamp alignment score to 1-10
+  parsed.alignmentScore = Math.max(1, Math.min(10, Math.round(parsed.alignmentScore)));
+
+  // Clamp breakthroughScore to 0-10
+  parsed.breakthroughScore = Math.max(0, Math.min(10, Math.round(parsed.breakthroughScore ?? 3)));
+
+  // Validate and clamp dimensions
+  parsed.dimensions = (Array.isArray(parsed.dimensions) ? parsed.dimensions : [])
+    .filter((d) => VALID_DIMENSIONS.includes(d.name))
+    .map((d) => ({
+      name: d.name,
+      relevance: Math.max(0, Math.min(10, Math.round(d.relevance ?? 0))),
+      alignmentScore: Math.max(0, Math.min(10, Math.round(d.alignmentScore ?? 0))),
+    }));
+
+  // Validate neglectedDimensions
+  parsed.neglectedDimensions = (Array.isArray(parsed.neglectedDimensions) ? parsed.neglectedDimensions : [])
+    .filter((d) => VALID_DIMENSIONS.includes(d));
+
+  // Validate dimensionPrompt
+  if (typeof parsed.dimensionPrompt !== "string") {
+    parsed.dimensionPrompt = "";
+  }
+
+  return { result: parsed, parseFailed };
+}
 
 type RecentEntry = {
   content: string;
@@ -88,17 +147,21 @@ export const analyzeEntry = action({
     ),
   },
   handler: async (ctx, args): Promise<AnalysisResult> => {
+    const log = createLogger("ai.analyzeEntry", { entryId: args.entryId });
     await authComponent.getAuthUser(ctx);
 
     const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
     if (!entry) {
-      throw new Error("Entry not found or not owned by user");
+      log.warn("entry not found or not owned by user");
+      throw new NotFoundError("Entry", args.entryId);
     }
+
+    log.info("starting analysis", { contentLength: args.content.length, recentCount: args.recentEntries.length });
 
     const recent = args.recentEntries.slice(0, 10);
     const recentContext = formatRecentEntries(recent);
 
-    const response = await getOpenAI().chat.completions.create({
+    const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 800,
       messages: [
@@ -143,57 +206,12 @@ ENTRY:
 ${args.content}`,
         },
       ],
-    });
+    }), { model: MODEL });
 
     const text = response.choices[0]?.message?.content ?? "{}";
-
-    // Strip markdown code fences if present
-    const cleaned = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-    let parsed: AnalysisResult;
-    try {
-      parsed = JSON.parse(cleaned) as AnalysisResult;
-    } catch {
-      parsed = {
-        patternInsight: "Unable to analyze this entry. Please try again.",
-        nudge: "What matters most to you right now?",
-        emotionalTone: "hopeful",
-        alignmentScore: 5,
-        alignmentRationale: "Analysis could not be completed.",
-        breakthroughScore: 3,
-        dimensions: [],
-        neglectedDimensions: [],
-        dimensionPrompt: "",
-      };
-    }
-
-    // Validate emotional tone
-    if (!EMOTIONAL_TONES.includes(parsed.emotionalTone)) {
-      parsed.emotionalTone = "hopeful";
-    }
-
-    // Clamp alignment score to 1-10
-    parsed.alignmentScore = Math.max(1, Math.min(10, Math.round(parsed.alignmentScore)));
-
-    // Clamp breakthroughScore to 0-10
-    parsed.breakthroughScore = Math.max(0, Math.min(10, Math.round(parsed.breakthroughScore ?? 3)));
-
-    // Validate and clamp dimensions
-    const validDimensionNames = ["career", "relationships", "health", "wealth", "creative"];
-    parsed.dimensions = (Array.isArray(parsed.dimensions) ? parsed.dimensions : [])
-      .filter((d) => validDimensionNames.includes(d.name))
-      .map((d) => ({
-        name: d.name,
-        relevance: Math.max(0, Math.min(10, Math.round(d.relevance ?? 0))),
-        alignmentScore: Math.max(0, Math.min(10, Math.round(d.alignmentScore ?? 0))),
-      }));
-
-    // Validate neglectedDimensions
-    parsed.neglectedDimensions = (Array.isArray(parsed.neglectedDimensions) ? parsed.neglectedDimensions : [])
-      .filter((d) => validDimensionNames.includes(d));
-
-    // Validate dimensionPrompt
-    if (typeof parsed.dimensionPrompt !== "string") {
-      parsed.dimensionPrompt = "";
+    const { result: parsed, parseFailed } = parseAndValidateAnalysis(text);
+    if (parseFailed) {
+      log.warn("failed to parse AI response as JSON", { rawLength: text.length });
     }
 
     // Store analysis on the entry
@@ -204,6 +222,13 @@ ${args.content}`,
 
     // Trigger milestone check
     await ctx.runMutation(internal.milestones.checkMilestones, { userId: entry!.userId });
+
+    log.done({
+      tone: parsed.emotionalTone,
+      alignment: parsed.alignmentScore,
+      breakthrough: parsed.breakthroughScore,
+      dimensions: parsed.dimensions.length,
+    });
 
     return parsed;
   },
@@ -231,12 +256,13 @@ export const generateDailyPrompt = action({
     ),
   },
   handler: async (ctx, args): Promise<string> => {
+    const log = createLogger("ai.generateDailyPrompt");
     await authComponent.getAuthUser(ctx);
 
     const recent = args.recentEntries.slice(0, 10);
     const recentContext = formatRecentEntries(recent);
 
-    const response = await getOpenAI().chat.completions.create({
+    const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 100,
       messages: [
@@ -261,7 +287,7 @@ Generate a journaling prompt that:
 Return ONLY the prompt text. Nothing else.`,
         },
       ],
-    });
+    }), { model: MODEL });
 
     return response.choices[0]?.message?.content?.trim()
       ?? "What would the person you're becoming do differently today?";
@@ -289,11 +315,12 @@ export const conversationalTurn = action({
     userMessage: v.string(),
   },
   handler: async (ctx, args): Promise<string> => {
+    const log = createLogger("ai.conversationalTurn", { historyLength: args.history.length });
     await authComponent.getAuthUser(ctx);
 
     const history = args.history.slice(-20);
 
-    const response = await getOpenAI().chat.completions.create({
+    const response = await log.time("openrouter call", () => getOpenAI().chat.completions.create({
       model: MODEL,
       max_tokens: 200,
       messages: [
@@ -313,7 +340,7 @@ When appropriate, hold the user accountable to their stated goals and gently cha
         })),
         { role: "user" as const, content: args.userMessage },
       ],
-    });
+    }), { model: MODEL });
 
     return response.choices[0]?.message?.content?.trim()
       ?? "Tell me more about that.";
@@ -323,11 +350,14 @@ When appropriate, hold the user accountable to their stated goals and gently cha
 export const generateEmbedding = internalAction({
   args: { text: v.string() },
   handler: async (_ctx, args): Promise<number[]> => {
-    // Use OpenAI-compatible embedding via OpenRouter
-    const response = await getOpenAI().embeddings.create({
-      model: "openai/text-embedding-3-small",
-      input: args.text.slice(0, 8000), // Limit input length
-    });
+    const log = createLogger("ai.generateEmbedding", { inputLength: args.text.length });
+    const response = await log.time("openrouter embedding", () =>
+      getOpenAI().embeddings.create({
+        model: "openai/text-embedding-3-small",
+        input: args.text.slice(0, 8000),
+      })
+    );
+    log.done({ dimensions: response.data[0].embedding.length });
     return response.data[0].embedding;
   },
 });
@@ -335,11 +365,17 @@ export const generateEmbedding = internalAction({
 export const embedAndStoreEntry = internalAction({
   args: { entryId: v.id("entries"), content: v.string() },
   handler: async (ctx, args) => {
+    const log = createLogger("ai.embedAndStoreEntry", { entryId: args.entryId });
     try {
-      const embedding = await ctx.runAction(internal.ai.generateEmbedding, { text: args.content });
+      const embedding = await log.time("generate embedding", () =>
+        ctx.runAction(internal.ai.generateEmbedding, { text: args.content })
+      );
       await ctx.runMutation(internal.ai.storeEmbedding, { entryId: args.entryId, embedding });
-    } catch {
-      // Silently fail - embeddings are optional enhancement
+      log.done();
+    } catch (err) {
+      log.error("embedding failed (non-critical)", {
+        error: formatError(err),
+      });
     }
   },
 });

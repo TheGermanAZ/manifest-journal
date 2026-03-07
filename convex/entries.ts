@@ -3,6 +3,7 @@ import { query, mutation, internalMutation, internalQuery } from "./_generated/s
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { requireAppUser, getAppUserId } from "./lib/authHelper";
+import { ValidationError, NotFoundError } from "./lib/errors";
 
 export const createEntry = mutation({
   args: {
@@ -17,7 +18,7 @@ export const createEntry = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
-    if (args.content.length > 50000) throw new Error("Content too long");
+    if (args.content.length > 50000) throw new ValidationError("Content too long", "content");
     const wordCount = args.content.trim().split(/\s+/).filter(Boolean).length;
     const entryId = await ctx.db.insert("entries", {
       userId,
@@ -126,7 +127,7 @@ export const toggleBookmark = mutation({
   handler: async (ctx, args) => {
     const userId = await requireAppUser(ctx);
     const entry = await ctx.db.get(args.entryId);
-    if (!entry || entry.userId !== userId) throw new Error("Not found");
+    if (!entry || entry.userId !== userId) throw new NotFoundError("Entry");
     await ctx.db.patch(args.entryId, { bookmarked: !entry.bookmarked });
   },
 });

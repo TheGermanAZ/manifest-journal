@@ -25,8 +25,8 @@ export function RelatedEntries({ content, onEntryClick }: RelatedEntriesProps) {
       try {
         const results = await findRelated({ content: content.trim() });
         setRelated(results);
-      } catch {
-        // Silently fail
+      } catch (err) {
+        console.warn("[RelatedEntries] search failed:", err);
       } finally {
         setIsLoading(false);
       }
