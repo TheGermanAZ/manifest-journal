@@ -171,13 +171,15 @@ export const entriesInDateRange = internalQuery({
     endMs: v.number(),
   },
   handler: async (ctx, args) => {
-    const entries = await ctx.db
+    return ctx.db
       .query("entries")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) =>
+        q
+          .eq("userId", args.userId)
+          .gte("_creationTime", args.startMs)
+          .lt("_creationTime", args.endMs),
+      )
       .order("desc")
       .collect();
-    return entries.filter(
-      (e) => e._creationTime >= args.startMs && e._creationTime <= args.endMs,
-    );
   },
 });

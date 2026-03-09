@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 interface ExportModalProps {
@@ -12,56 +12,70 @@ export function ExportModal({ onClose }: ExportModalProps) {
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [includeAnalysis, setIncludeAnalysis] = useState(true);
   const [format, setFormat] = useState<"json" | "text">("text");
+  const [isExporting, setIsExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const prepareExport = useAction(api.export.prepareExport);
 
-  const entries = useQuery(api.export.exportEntries, {
-    startDate: startDate || undefined,
-    endDate: endDate || undefined,
-    bookmarkedOnly,
-    includeAnalysis,
-  });
+  const handleExport = async () => {
+    setIsExporting(true);
+    setError(null);
+    try {
+      const entries = await prepareExport({
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        bookmarkedOnly,
+        includeAnalysis,
+      });
 
-  const handleExport = () => {
-    if (!entries || entries.length === 0) return;
+      if (entries.length === 0) {
+        setError("No entries matched those filters.");
+        return;
+      }
 
-    let content: string;
-    let filename: string;
-    let type: string;
+      let content: string;
+      let filename: string;
+      let type: string;
 
-    if (format === "json") {
-      content = JSON.stringify(entries, null, 2);
-      filename = `manifest-journal-${new Date().toISOString().split("T")[0]}.json`;
-      type = "application/json";
-    } else {
-      content = entries
-        .map((e: any) => {
-          const date = new Date(e._creationTime).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-          let text = `--- ${date} ---\nMode: ${e.mode}\n\n${e.content}\n`;
-          if (e.analysis && includeAnalysis) {
-            text += `\nTone: ${e.analysis.emotionalTone}`;
-            text += `\nAlignment: ${e.analysis.alignmentScore}/10`;
-            text += `\nInsight: ${e.analysis.patternInsight}`;
-            text += `\nNudge: ${e.analysis.nudge}\n`;
-          }
-          return text;
-        })
-        .join("\n\n");
-      filename = `manifest-journal-${new Date().toISOString().split("T")[0]}.txt`;
-      type = "text/plain";
+      if (format === "json") {
+        content = JSON.stringify(entries, null, 2);
+        filename = `manifest-journal-${new Date().toISOString().split("T")[0]}.json`;
+        type = "application/json";
+      } else {
+        content = entries
+          .map((e: any) => {
+            const date = new Date(e._creationTime).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+            let text = `--- ${date} ---\nMode: ${e.mode}\n\n${e.content}\n`;
+            if (e.analysis && includeAnalysis) {
+              text += `\nTone: ${e.analysis.emotionalTone}`;
+              text += `\nAlignment: ${e.analysis.alignmentScore}/10`;
+              text += `\nInsight: ${e.analysis.patternInsight}`;
+              text += `\nNudge: ${e.analysis.nudge}\n`;
+            }
+            return text;
+          })
+          .join("\n\n");
+        filename = `manifest-journal-${new Date().toISOString().split("T")[0]}.txt`;
+        type = "text/plain";
+      }
+
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Export failed");
+    } finally {
+      setIsExporting(false);
     }
-
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-    onClose();
   };
 
   return (
@@ -141,23 +155,30 @@ export function ExportModal({ onClose }: ExportModalProps) {
           </div>
         </div>
 
+        {error && (
+          <p className="text-sm text-red-700">
+            {error}
+          </p>
+        )}
+
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--ink-light)]">
-            {entries ? `${entries.length} entries` : "Loading..."}
+            Filters are applied when you export
           </span>
           <div className="flex gap-2">
             <button
               onClick={onClose}
+              disabled={isExporting}
               className="text-sm text-[var(--ink-light)] px-3 py-1.5"
             >
               Cancel
             </button>
             <button
               onClick={handleExport}
-              disabled={!entries || entries.length === 0}
+              disabled={isExporting}
               className="ink-cta py-1.5 px-4 text-sm disabled:opacity-40"
             >
-              Export
+              {isExporting ? "Exporting..." : "Export"}
             </button>
           </div>
         </div>

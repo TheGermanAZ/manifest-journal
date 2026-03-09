@@ -28,11 +28,12 @@ export const getActivePath = query({
   handler: async (ctx) => {
     const userId = await getAppUserId(ctx);
     if (!userId) return null;
-    const progress = await ctx.db
+    const active = await ctx.db
       .query("pathProgress")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .collect();
-    const active = progress.find((p) => p.status === "active");
+      .withIndex("by_user_status", (q) =>
+        q.eq("userId", userId).eq("status", "active"),
+      )
+      .first();
     if (!active) return null;
     const path = await ctx.db.get(active.pathId);
     if (!path) return null;
@@ -46,11 +47,12 @@ export const startPath = mutation({
     const userId = await requireAppUser(ctx);
 
     // Check no active path
-    const existing = await ctx.db
+    const active = await ctx.db
       .query("pathProgress")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .collect();
-    const active = existing.find((p) => p.status === "active");
+      .withIndex("by_user_status", (q) =>
+        q.eq("userId", userId).eq("status", "active"),
+      )
+      .first();
     if (active) throw new ConflictError("Already on a path. Complete or abandon it first.");
 
     return ctx.db.insert("pathProgress", {

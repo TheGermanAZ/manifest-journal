@@ -98,7 +98,9 @@ export default defineSchema({
     achievedAt: v.number(),
     seen: v.boolean(),
     aiMessage: v.optional(v.string()),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_seen", ["userId", "seen"]),
 
   dreamProfileVersions: defineTable({
     userId: v.id("users"),
@@ -163,5 +165,7 @@ export default defineSchema({
       entryId: v.id("entries"),
       completedAt: v.number(),
     })),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_status", ["userId", "status"]),
 });

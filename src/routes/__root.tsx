@@ -4,6 +4,7 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { authClient } from "../lib/auth-client";
 import { useRef } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { AppAuthProvider } from "../lib/AppAuthProvider";
 import '../styles.css'
 
 export const Route = createRootRoute({
@@ -46,7 +47,9 @@ function Root() {
       </head>
       <body>
         <ConvexBetterAuthProvider client={convex} authClient={authClient}>
-          <Outlet />
+          <AppAuthProvider>
+            <Outlet />
+          </AppAuthProvider>
         </ConvexBetterAuthProvider>
         <Analytics />
         <Scripts />

@@ -23,7 +23,7 @@ function RegisterPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  if (isPending) {
+  if (isPending && isAuthenticated) {
     return (
       <main className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-[var(--ink-light)] text-base">Loading...</div>
