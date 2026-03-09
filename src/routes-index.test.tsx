@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { Route } from "./routes/index";
 
-vi.mock("./lib/useAuthSettled", () => ({
-  useAuthSettled: vi.fn(),
+vi.mock("./lib/AppAuthProvider", () => ({
+  useAppAuth: vi.fn(),
 }));
 vi.mock("./components/LandingPage", () => ({
   LandingPage: () => (
@@ -13,13 +13,13 @@ vi.mock("./components/LandingPage", () => ({
   ),
 }));
 
-import { useAuthSettled } from "./lib/useAuthSettled";
+import { useAppAuth } from "./lib/AppAuthProvider";
 
 const IndexPage = Route.options.component as () => JSX.Element;
 
 describe("index route auth state handling", () => {
   beforeEach(() => {
-    vi.mocked(useAuthSettled).mockReset();
+    vi.mocked(useAppAuth).mockReset();
     window.history.replaceState({}, "", "/");
   });
 
@@ -29,8 +29,7 @@ describe("index route auth state handling", () => {
 
   it("renders loading instead of landing during auth callback handoff", async () => {
     window.history.replaceState({}, "", "/?authCallback=1");
-    vi.mocked(useAuthSettled).mockReturnValue({
-      session: null,
+    vi.mocked(useAppAuth).mockReturnValue({
       isAuthenticated: false,
       isPending: true,
     });
@@ -43,8 +42,7 @@ describe("index route auth state handling", () => {
   });
 
   it("renders landing when unauthenticated and no callback flow", async () => {
-    vi.mocked(useAuthSettled).mockReturnValue({
-      session: null,
+    vi.mocked(useAppAuth).mockReturnValue({
       isAuthenticated: false,
       isPending: false,
     });
@@ -58,4 +56,3 @@ describe("index route auth state handling", () => {
     });
   });
 });
-

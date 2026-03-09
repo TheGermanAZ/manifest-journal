@@ -11,6 +11,11 @@ const AUTH_CALLBACK_PARAMS = [
   "error_uri",
 ] as const;
 
+const SESSION_STORAGE_KEY = "better-auth_session_data";
+const COOKIE_STORAGE_KEY = "better-auth_cookie";
+const AUTH_PENDING_TIMEOUT_MS = 3_000;
+const AUTH_CALLBACK_TIMEOUT_MS = 8_000;
+
 function hasAuthCallbackParams() {
   if (typeof window === "undefined") return false;
   const search = new URLSearchParams(window.location.search);
@@ -23,6 +28,24 @@ function clearAuthCallbackParams(url: URL) {
   }
 }
 
+function readCachedSession() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearCachedSession() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(SESSION_STORAGE_KEY);
+  window.localStorage.removeItem(COOKIE_STORAGE_KEY);
+}
+
 /**
  * Wraps authClient.useSession() to handle OAuth callback handoff timing.
  *
@@ -31,14 +54,49 @@ function clearAuthCallbackParams(url: URL) {
  */
 export function useAuthSettled() {
   const { data: session, isPending } = authClient.useSession();
-  const [mounted, setMounted] = useState(false);
   const [authRedirectPending, setAuthRedirectPending] = useState(
     hasAuthCallbackParams,
   );
+  const [cachedSession, setCachedSession] = useState(readCachedSession);
+  const [sessionTimedOut, setSessionTimedOut] = useState(false);
+  const [callbackTimedOut, setCallbackTimedOut] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setCachedSession(readCachedSession());
   }, []);
+
+  useEffect(() => {
+    if (!isPending) {
+      setSessionTimedOut(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSessionTimedOut(true);
+      clearCachedSession();
+      setCachedSession(null);
+    }, AUTH_PENDING_TIMEOUT_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [isPending]);
+
+  useEffect(() => {
+    if (!authRedirectPending) {
+      setCallbackTimedOut(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      clearAuthCallbackParams(url);
+      window.history.replaceState({}, "", url.toString());
+      setCallbackTimedOut(true);
+      setAuthRedirectPending(false);
+      setCachedSession(readCachedSession());
+    }, AUTH_CALLBACK_TIMEOUT_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [authRedirectPending]);
 
   useEffect(() => {
     if (!authRedirectPending) {
@@ -58,11 +116,28 @@ export function useAuthSettled() {
     clearAuthCallbackParams(url);
     window.history.replaceState({}, "", url.toString());
     setAuthRedirectPending(false);
+    setCallbackTimedOut(false);
   }, [authRedirectPending, session]);
 
+  useEffect(() => {
+    if (isPending || session !== null) {
+      return;
+    }
+
+    clearCachedSession();
+    setCachedSession(null);
+  }, [isPending, session]);
+
+  const resolvedSession = session ?? cachedSession;
+  const resolvedPending =
+    ((!!resolvedSession || authRedirectPending) &&
+      isPending &&
+      !sessionTimedOut) ||
+    (authRedirectPending && !callbackTimedOut);
+
   return {
-    session,
-    isAuthenticated: !!session,
-    isPending: !mounted || isPending || authRedirectPending,
+    session: resolvedSession,
+    isAuthenticated: !!resolvedSession,
+    isPending: resolvedPending,
   };
 }

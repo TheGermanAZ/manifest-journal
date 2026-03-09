@@ -8,7 +8,7 @@ import { ConversationView } from "../components/ConversationView";
 import { PathProgressBanner } from "../components/PathProgressBanner";
 import { LandingPage } from "../components/LandingPage";
 import { authClient } from "../lib/auth-client";
-import { useAuthSettled } from "../lib/useAuthSettled";
+import { useAppAuth } from "../lib/AppAuthProvider";
 import { formatError } from "../lib/errors";
 
 export const Route = createFileRoute("/")({
@@ -19,15 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 function IndexPage() {
-  const { isAuthenticated, isPending } = useAuthSettled();
-
-  if (isPending) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-[var(--ink-light)] text-base">Loading...</div>
-      </div>
-    );
-  }
+  const { isAuthenticated } = useAppAuth();
 
   if (!isAuthenticated) {
     return <LandingPage />;
@@ -79,19 +71,7 @@ function HomePage() {
   const abandonPath = useMutation(api.paths.abandonPath);
   const addTurn = useMutation(api.conversations.addTurn);
   const convoTurn = useAction(api.ai.conversationalTurn);
-  const ensureUser = useMutation(api.users.ensureUser);
   const navigate = useNavigate();
-  const hasProvisioned = useRef(false);
-
-  // Provision app user row on first load (mirrors AuthGuard behavior)
-  useEffect(() => {
-    if (!hasProvisioned.current) {
-      hasProvisioned.current = true;
-      ensureUser().catch((err) =>
-        console.error("Failed to ensure user:", err),
-      );
-    }
-  }, [ensureUser]);
 
   const hasDreamProfile = !!user?.dreamProfile;
 

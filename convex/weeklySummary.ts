@@ -19,7 +19,7 @@ export const generateWeeklySummary = internalAction({
     });
 
     const startMs = new Date(args.weekStarting).getTime();
-    const endMs = new Date(args.weekEnding).getTime() + 86400000; // include end day
+    const endMs = new Date(args.weekEnding).getTime() + 86400000; // exclusive upper bound
 
     const entries = await ctx.runQuery(internal.entries.entriesInDateRange, {
       userId: args.userId,

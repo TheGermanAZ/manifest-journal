@@ -63,16 +63,39 @@ export function parseAndValidateAnalysis(rawText: string): {
     return { result: { ...FALLBACK_ANALYSIS }, parseFailed: true };
   }
 
+  if (!parsed || typeof parsed !== "object") {
+    return { result: { ...FALLBACK_ANALYSIS }, parseFailed: true };
+  }
+
+  if (typeof parsed.patternInsight !== "string" || !parsed.patternInsight.trim()) {
+    parsed.patternInsight = FALLBACK_ANALYSIS.patternInsight;
+  }
+
+  if (typeof parsed.nudge !== "string" || !parsed.nudge.trim()) {
+    parsed.nudge = FALLBACK_ANALYSIS.nudge;
+  }
+
+  if (
+    typeof parsed.alignmentRationale !== "string" ||
+    !parsed.alignmentRationale.trim()
+  ) {
+    parsed.alignmentRationale = FALLBACK_ANALYSIS.alignmentRationale;
+  }
+
   // Validate emotional tone
   if (!EMOTIONAL_TONES.includes(parsed.emotionalTone)) {
     parsed.emotionalTone = "hopeful";
   }
 
   // Clamp alignment score to 1-10
-  parsed.alignmentScore = Math.max(1, Math.min(10, Math.round(parsed.alignmentScore)));
+  parsed.alignmentScore = Number.isFinite(parsed.alignmentScore)
+    ? Math.max(1, Math.min(10, Math.round(parsed.alignmentScore)))
+    : FALLBACK_ANALYSIS.alignmentScore;
 
   // Clamp breakthroughScore to 0-10
-  parsed.breakthroughScore = Math.max(0, Math.min(10, Math.round(parsed.breakthroughScore ?? 3)));
+  parsed.breakthroughScore = Number.isFinite(parsed.breakthroughScore)
+    ? Math.max(0, Math.min(10, Math.round(parsed.breakthroughScore)))
+    : FALLBACK_ANALYSIS.breakthroughScore;
 
   // Validate and clamp dimensions
   parsed.dimensions = (Array.isArray(parsed.dimensions) ? parsed.dimensions : [])
@@ -231,6 +254,36 @@ ${args.content}`,
     });
 
     return parsed;
+  },
+});
+
+export const retryAnalysis = action({
+  args: { entryId: v.id("entries") },
+  handler: async (ctx, args) => {
+    await authComponent.getAuthUser(ctx);
+    const entry = await ctx.runQuery(api.entries.getEntry, { entryId: args.entryId });
+    if (!entry) throw new NotFoundError("Entry", args.entryId);
+    if (entry.analysis) return; // already analyzed
+
+    const user = await ctx.runQuery(api.users.currentUser);
+    if (!user?.dreamProfile) throw new Error("Dream profile required");
+
+    const recent = await ctx.runQuery(api.entries.recentEntries, { limit: 7 });
+    const recentForAnalysis = (recent ?? [])
+      .filter((e) => e._id !== args.entryId)
+      .map((e) => ({
+        content: e.content,
+        date: new Date(e._creationTime).toISOString().split("T")[0],
+        tone: e.analysis?.emotionalTone,
+        alignmentScore: e.analysis?.alignmentScore,
+      }));
+
+    await ctx.runAction(api.ai.analyzeEntry, {
+      entryId: args.entryId,
+      content: entry.content,
+      dreamProfile: user.dreamProfile,
+      recentEntries: recentForAnalysis,
+    });
   },
 });
 

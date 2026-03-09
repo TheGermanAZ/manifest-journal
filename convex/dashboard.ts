@@ -110,23 +110,31 @@ export function calculateStreak(
   graceDaysPerWeek: number = 0
 ): { streak: number; graceDaysUsedThisWeek: number } {
   if (entries.length === 0) return { streak: 0, graceDaysUsedThisWeek: 0 };
+  const ONE_DAY = 1000 * 60 * 60 * 24;
+
+  function startOfLocalDay(timestamp: number) {
+    const d = new Date(timestamp);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function dayOrdinal(date: Date) {
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / ONE_DAY;
+  }
 
   // Deduplicate to unique calendar days (entries are already sorted desc)
   const uniqueDays: Date[] = [];
   for (const entry of entries) {
-    const d = new Date(entry._creationTime);
-    d.setHours(0, 0, 0, 0);
+    const d = startOfLocalDay(entry._creationTime);
     if (uniqueDays.length === 0 || uniqueDays[uniqueDays.length - 1].getTime() !== d.getTime()) {
       uniqueDays.push(d);
     }
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const ONE_DAY = 1000 * 60 * 60 * 24;
+  const today = startOfLocalDay(Date.now());
 
   // The most recent journaled day must be today or yesterday to have an active streak
-  const gapToMostRecent = (today.getTime() - uniqueDays[0].getTime()) / ONE_DAY;
+  const gapToMostRecent = dayOrdinal(today) - dayOrdinal(uniqueDays[0]);
   if (gapToMostRecent > 1) return { streak: 0, graceDaysUsedThisWeek: 0 };
 
   // Helper: get ISO week key for a date
@@ -146,12 +154,13 @@ export function calculateStreak(
   const currentWeekKey = getISOWeek(uniqueDays[0]);
 
   for (let i = 1; i < uniqueDays.length; i++) {
-    const diff = (uniqueDays[i - 1].getTime() - uniqueDays[i].getTime()) / ONE_DAY;
+    const diff = dayOrdinal(uniqueDays[i - 1]) - dayOrdinal(uniqueDays[i]);
     if (diff === 1) {
       streak++;
     } else if (diff === 2 && graceDaysPerWeek > 0) {
       // 1-day gap - check if we can use a grace day
-      const gapDay = new Date(uniqueDays[i].getTime() + ONE_DAY);
+      const gapDay = new Date(uniqueDays[i].getTime());
+      gapDay.setDate(gapDay.getDate() + 1);
       const weekKey = getISOWeek(gapDay);
       const used = graceUsedByWeek[weekKey] ?? 0;
       if (used < graceDaysPerWeek) {
@@ -177,9 +186,16 @@ export const calendarData = query({
     const userId = await getAppUserId(ctx);
     if (!userId) return null;
 
+    const monthStart = new Date(args.year, args.month - 1, 1).getTime();
+    const nextMonthStart = new Date(args.year, args.month, 1).getTime();
     const entries = await ctx.db
       .query("entries")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_user", (q) =>
+        q
+          .eq("userId", userId)
+          .gte("_creationTime", monthStart)
+          .lt("_creationTime", nextMonthStart),
+      )
       .order("desc")
       .collect();
 
@@ -191,9 +207,6 @@ export const calendarData = query({
 
     for (const entry of entries) {
       const d = new Date(entry._creationTime);
-      if (d.getFullYear() !== args.year || d.getMonth() + 1 !== args.month)
-        continue;
-
       const dayKey = d.getDate().toString();
       if (!dayMap[dayKey]) {
         dayMap[dayKey] = { tones: [], alignmentScores: [], count: 0 };

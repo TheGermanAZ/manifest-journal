@@ -28,25 +28,9 @@ const siteUrl =
   process.env.SITE_URL ||
   configuredClientOrigins[0] ||
   localhostOrigin;
-
-export function isAllowedOrigin(origin: string) {
-  if (!origin) return false;
-
-  if (configuredClientOrigins.includes(origin)) {
-    return true;
-  }
-
-  if (origin === localhostOrigin) {
-    return true;
-  }
-
-  try {
-    const { protocol, hostname } = new URL(origin);
-    return protocol === "https:" && hostname.endsWith(".vercel.app");
-  } catch {
-    return false;
-  }
-}
+const trustedOrigins = Array.from(
+  new Set([siteUrl, localhostOrigin, ...configuredClientOrigins]),
+);
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
@@ -58,20 +42,7 @@ export const createAuth = (
     logger: { disabled: optionsOnly },
     baseURL: convexSiteUrl,
     secret: process.env.BETTER_AUTH_SECRET,
-    trustedOrigins: (request) => {
-      const requestOrigin = request.headers.get("origin") ?? "";
-      const trustedOrigins = new Set([
-        siteUrl,
-        localhostOrigin,
-        ...configuredClientOrigins,
-      ]);
-
-      if (requestOrigin && isAllowedOrigin(requestOrigin)) {
-        trustedOrigins.add(requestOrigin);
-      }
-
-      return Array.from(trustedOrigins);
-    },
+    trustedOrigins,
     database: authComponent.adapter(ctx),
     account: {
       storeStateStrategy: "database",

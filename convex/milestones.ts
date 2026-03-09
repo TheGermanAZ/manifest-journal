@@ -183,11 +183,13 @@ export const unseenMilestones = query({
   handler: async (ctx) => {
     const userId = await getAppUserId(ctx);
     if (!userId) return [];
-    const milestones = await ctx.db
+    return ctx.db
       .query("milestones")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .withIndex("by_user_seen", (q) =>
+        q.eq("userId", userId).eq("seen", false),
+      )
+      .order("desc")
       .collect();
-    return milestones.filter((m) => !m.seen);
   },
 });
 

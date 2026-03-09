@@ -1,14 +1,20 @@
-import { action, internalAction, internalQuery } from "./_generated/server";
+import { action, internalAction, internalQuery, type ActionCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import { authComponent } from "./auth";
 import { AuthError } from "./lib/errors";
+
+async function requireSearchUserId(
+  ctx: ActionCtx,
+) {
+  const user = await ctx.runQuery(api.users.currentUser, {});
+  if (!user) throw new AuthError("User not provisioned");
+  return user._id;
+}
 
 export const searchEntries = action({
   args: { query: v.string() },
   handler: async (ctx, args) => {
-    const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new AuthError();
+    const userId = await requireSearchUserId(ctx);
 
     // Generate embedding for the search query
     const queryEmbedding = await ctx.runAction(internal.ai.generateEmbedding, {
@@ -19,6 +25,7 @@ export const searchEntries = action({
     const results = await ctx.vectorSearch("entries", "by_embedding", {
       vector: queryEmbedding,
       limit: 10,
+      filter: (q) => q.eq("userId", userId),
     });
 
     // Fetch full entries
@@ -36,8 +43,7 @@ export const searchEntries = action({
 export const findRelatedEntries = action({
   args: { content: v.string() },
   handler: async (ctx, args) => {
-    const authUser = await authComponent.getAuthUser(ctx);
-    if (!authUser) throw new AuthError();
+    const userId = await requireSearchUserId(ctx);
 
     const queryEmbedding = await ctx.runAction(internal.ai.generateEmbedding, {
       text: args.content.slice(0, 500),
@@ -46,6 +52,7 @@ export const findRelatedEntries = action({
     const results = await ctx.vectorSearch("entries", "by_embedding", {
       vector: queryEmbedding,
       limit: 3,
+      filter: (q) => q.eq("userId", userId),
     });
 
     const entries = await Promise.all(
